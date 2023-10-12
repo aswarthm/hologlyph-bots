@@ -1,0 +1,43 @@
+[0.593s] Invoking command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/src/hb_task_1a': PYTHONPATH=/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/prefix_override:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/hb_task_1a build --build-base /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build install --record /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/install.log --single-version-externally-managed
+[0.827s] running egg_info
+[0.827s] creating ../../build/hb_task_1a/hb_task_1a.egg-info
+[0.827s] writing ../../build/hb_task_1a/hb_task_1a.egg-info/PKG-INFO
+[0.827s] writing dependency_links to ../../build/hb_task_1a/hb_task_1a.egg-info/dependency_links.txt
+[0.827s] writing entry points to ../../build/hb_task_1a/hb_task_1a.egg-info/entry_points.txt
+[0.828s] writing requirements to ../../build/hb_task_1a/hb_task_1a.egg-info/requires.txt
+[0.828s] writing top-level names to ../../build/hb_task_1a/hb_task_1a.egg-info/top_level.txt
+[0.828s] writing manifest file '../../build/hb_task_1a/hb_task_1a.egg-info/SOURCES.txt'
+[0.829s] reading manifest file '../../build/hb_task_1a/hb_task_1a.egg-info/SOURCES.txt'
+[0.830s] writing manifest file '../../build/hb_task_1a/hb_task_1a.egg-info/SOURCES.txt'
+[0.830s] running build
+[0.830s] running build_py
+[0.830s] creating /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build
+[0.831s] creating /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib
+[0.831s] creating /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a
+[0.831s] copying hb_task_1a/task_1a_1036.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a
+[0.831s] copying hb_task_1a/subscriber_function.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a
+[0.831s] copying hb_task_1a/__init__.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a
+[0.831s] copying hb_task_1a/publisher_function.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a
+[0.831s] running install
+[0.831s] running install_lib
+[0.831s] creating /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a
+[0.832s] copying /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a/task_1a_1036.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a
+[0.832s] copying /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a/subscriber_function.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a
+[0.832s] copying /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a/__init__.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a
+[0.832s] copying /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a/publisher_function.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a
+[0.832s] byte-compiling /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a/task_1a_1036.py to task_1a_1036.cpython-310.pyc
+[0.833s] byte-compiling /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a/subscriber_function.py to subscriber_function.cpython-310.pyc
+[0.834s] byte-compiling /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a/__init__.py to __init__.cpython-310.pyc
+[0.834s] byte-compiling /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a/publisher_function.py to publisher_function.cpython-310.pyc
+[0.834s] running install_data
+[0.835s] creating /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/share/ament_index
+[0.835s] creating /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/share/ament_index/resource_index
+[0.835s] creating /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/share/ament_index/resource_index/packages
+[0.835s] copying resource/hb_task_1a -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/share/ament_index/resource_index/packages
+[0.835s] copying package.xml -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/share/hb_task_1a
+[0.835s] running install_egg_info
+[0.837s] Copying ../../build/hb_task_1a/hb_task_1a.egg-info to /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a-0.0.0-py3.10.egg-info
+[0.837s] running install_scripts
+[0.854s] Installing publisher_turt script to /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/hb_task_1a
+[0.854s] writing list of installed files to '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/install.log'
+[0.877s] Invoked command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/src/hb_task_1a' returned '0': PYTHONPATH=/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/prefix_override:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/hb_task_1a build --build-base /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build install --record /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/install.log --single-version-externally-managed

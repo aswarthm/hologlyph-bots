@@ -1,0 +1,24 @@
+[0.707s] Invoking command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/src/hb_task_1a': PYTHONPATH=/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/prefix_override:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/hb_task_1a build --build-base /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build install --record /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/install.log --single-version-externally-managed
+[0.965s] running egg_info
+[0.965s] writing ../../build/hb_task_1a/hb_task_1a.egg-info/PKG-INFO
+[0.966s] writing dependency_links to ../../build/hb_task_1a/hb_task_1a.egg-info/dependency_links.txt
+[0.966s] writing entry points to ../../build/hb_task_1a/hb_task_1a.egg-info/entry_points.txt
+[0.966s] writing requirements to ../../build/hb_task_1a/hb_task_1a.egg-info/requires.txt
+[0.966s] writing top-level names to ../../build/hb_task_1a/hb_task_1a.egg-info/top_level.txt
+[0.968s] reading manifest file '../../build/hb_task_1a/hb_task_1a.egg-info/SOURCES.txt'
+[0.968s] writing manifest file '../../build/hb_task_1a/hb_task_1a.egg-info/SOURCES.txt'
+[0.968s] running build
+[0.968s] running build_py
+[0.969s] copying hb_task_1a/task_1a_1036.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a
+[0.969s] running install
+[0.969s] running install_lib
+[0.970s] copying /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build/lib/hb_task_1a/task_1a_1036.py -> /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a
+[0.970s] byte-compiling /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a/task_1a_1036.py to task_1a_1036.cpython-310.pyc
+[0.972s] running install_data
+[0.972s] running install_egg_info
+[0.974s] removing '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a-0.0.0-py3.10.egg-info' (and everything under it)
+[0.974s] Copying ../../build/hb_task_1a/hb_task_1a.egg-info to /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages/hb_task_1a-0.0.0-py3.10.egg-info
+[0.975s] running install_scripts
+[0.992s] Installing publisher_turt script to /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/hb_task_1a
+[0.992s] writing list of installed files to '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/install.log'
+[1.015s] Invoked command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/src/hb_task_1a' returned '0': PYTHONPATH=/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/prefix_override:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/hb_task_1a build --build-base /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/build install --record /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/hb_task_1a/install.log --single-version-externally-managed

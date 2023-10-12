@@ -1,0 +1,366 @@
+[0.015s] Invoking command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a:/opt/ros/humble /home/aswarth/.local/bin/cmake /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/src/ros_tutorials/turtlesim -DCMAKE_INSTALL_PREFIX=/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim
+[0.048s] -- Found ament_cmake: 1.3.5 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.256s] -- Found ament_index_cpp: 1.4.0 (/opt/ros/humble/share/ament_index_cpp/cmake)
+[0.256s] -- Found geometry_msgs: 4.2.3 (/opt/ros/humble/share/geometry_msgs/cmake)
+[0.282s] -- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.285s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.291s] -- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.303s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.320s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.447s] -- Found rclcpp: 16.0.5 (/opt/ros/humble/share/rclcpp/cmake)
+[0.496s] -- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.497s] -- Found rmw_fastrtps_cpp: 6.2.3 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.614s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.744s] -- Found rclcpp_action: 16.0.5 (/opt/ros/humble/share/rclcpp_action/cmake)
+[0.841s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[0.849s] -- Found std_srvs: 4.2.3 (/opt/ros/humble/share/std_srvs/cmake)
+[1.288s] -- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+[1.954s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[2.229s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.254s] -- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+[2.276s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[2.277s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[2.277s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+[2.310s] -- Configuring done (2.3s)
+[2.376s] -- Generating done (0.1s)
+[2.380s] -- Build files have been written to: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim
+[2.397s] Invoked command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a:/opt/ros/humble /home/aswarth/.local/bin/cmake /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/src/ros_tutorials/turtlesim -DCMAKE_INSTALL_PREFIX=/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim
+[2.398s] Invoking command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a:/opt/ros/humble /home/aswarth/.local/bin/cmake --build /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim -- -j16 -l16
+[2.464s] [  1%] Built target turtlesim__cpp
+[2.469s] [ 11%] Built target turtlesim__rosidl_generator_c
+[2.472s] [ 11%] Built target ament_cmake_python_copy_turtlesim
+[2.490s] [ 21%] Built target turtlesim__rosidl_typesupport_c
+[2.490s] [ 31%] Built target turtlesim__rosidl_typesupport_introspection_c
+[2.495s] [ 41%] Built target turtlesim__rosidl_typesupport_cpp
+[2.496s] [ 51%] Built target turtlesim__rosidl_typesupport_introspection_cpp
+[2.498s] [ 61%] Built target turtlesim__rosidl_typesupport_fastrtps_cpp
+[2.503s] [ 71%] Built target turtlesim__rosidl_typesupport_fastrtps_c
+[2.518s] [ 71%] Built target turtlesim
+[2.523s] [ 73%] Built target draw_square
+[2.524s] [ 75%] Built target turtle_teleop_key
+[2.525s] [ 77%] Built target mimic
+[2.532s] [ 78%] Built target turtlesim__py
+[2.543s] [ 84%] Built target turtlesim_node
+[2.562s] [ 93%] Built target turtlesim__rosidl_generator_py
+[2.583s] [ 95%] Built target turtlesim__rosidl_typesupport_introspection_c__pyext
+[2.583s] [ 97%] Built target turtlesim__rosidl_typesupport_c__pyext
+[2.583s] [100%] Built target turtlesim__rosidl_typesupport_fastrtps_c__pyext
+[2.836s] running egg_info
+[2.837s] writing turtlesim.egg-info/PKG-INFO
+[2.837s] writing dependency_links to turtlesim.egg-info/dependency_links.txt
+[2.838s] writing top-level names to turtlesim.egg-info/top_level.txt
+[2.840s] reading manifest file 'turtlesim.egg-info/SOURCES.txt'
+[2.841s] writing manifest file 'turtlesim.egg-info/SOURCES.txt'
+[2.860s] [100%] Built target ament_cmake_python_build_turtlesim_egg
+[2.871s] Invoked command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a:/opt/ros/humble /home/aswarth/.local/bin/cmake --build /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim -- -j16 -l16
+[3.295s] Invoking command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a:/opt/ros/humble /home/aswarth/.local/bin/cmake --install /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim
+[3.324s] -- Install configuration: ""
+[3.324s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/ament_index/resource_index/rosidl_interfaces/turtlesim
+[3.324s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim
+[3.324s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg
+[3.324s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/pose.h
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/color.h
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/rosidl_generator_c__visibility_control.h
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__type_support.h
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__functions.h
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__functions.c
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__struct.h
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__type_support.h
+[3.325s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__functions.c
+[3.326s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__struct.h
+[3.326s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__functions.h
+[3.326s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action
+[3.326s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail
+[3.326s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__functions.c
+[3.326s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__type_support.h
+[3.326s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__functions.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__struct.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/rotate_absolute.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/teleport_absolute.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/set_pen.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/spawn.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/teleport_relative.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__struct.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__functions.h
+[3.327s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__struct.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__functions.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__type_support.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__struct.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__functions.c
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__functions.c
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__functions.c
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__type_support.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__functions.c
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__type_support.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__functions.c
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__struct.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__struct.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__type_support.h
+[3.328s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__functions.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__type_support.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__functions.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__functions.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/kill.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/library_path.sh
+[3.329s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/library_path.dsv
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_generator_c.so
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__rosidl_typesupport_fastrtps_c.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__rosidl_typesupport_fastrtps_c.h
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action
+[3.329s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__rosidl_typesupport_fastrtps_c.h
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__rosidl_typesupport_fastrtps_c.h
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__rosidl_typesupport_fastrtps_c.h
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__rosidl_typesupport_fastrtps_c.h
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__rosidl_typesupport_fastrtps_c.h
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__rosidl_typesupport_fastrtps_c.h
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_typesupport_fastrtps_c.so
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/pose.hpp
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/color.hpp
+[3.330s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__builder.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__traits.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__struct.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__builder.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__struct.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__traits.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/rotate_absolute.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__struct.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__traits.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__builder.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/spawn.hpp
+[3.331s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/set_pen.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/kill.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/teleport_relative.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/teleport_absolute.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__builder.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__traits.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__builder.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__struct.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__struct.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__traits.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__traits.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__traits.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__struct.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__struct.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__builder.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__builder.hpp
+[3.332s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__builder.hpp
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__traits.hpp
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__struct.hpp
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__rosidl_typesupport_fastrtps_cpp.hpp
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__rosidl_typesupport_fastrtps_cpp.hpp
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/dds_fastrtps
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__rosidl_typesupport_fastrtps_cpp.hpp
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/dds_fastrtps
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__rosidl_typesupport_fastrtps_cpp.hpp
+[3.333s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__rosidl_typesupport_fastrtps_cpp.hpp
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__rosidl_typesupport_fastrtps_cpp.hpp
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__rosidl_typesupport_fastrtps_cpp.hpp
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__rosidl_typesupport_fastrtps_cpp.hpp
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/dds_fastrtps
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_typesupport_fastrtps_cpp.so
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__rosidl_typesupport_introspection_c.h
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__rosidl_typesupport_introspection_c.h
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__type_support.c
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__type_support.c
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail
+[3.334s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__type_support.c
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__rosidl_typesupport_introspection_c.h
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__type_support.c
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__type_support.c
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__type_support.c
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__rosidl_typesupport_introspection_c.h
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__type_support.c
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__rosidl_typesupport_introspection_c.h
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__type_support.c
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__rosidl_typesupport_introspection_c.h
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__rosidl_typesupport_introspection_c.h
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__rosidl_typesupport_introspection_c.h
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_typesupport_introspection_c.so
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_typesupport_c.so
+[3.335s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__type_support.cpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__rosidl_typesupport_introspection_cpp.hpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/pose__type_support.cpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/msg/detail/color__rosidl_typesupport_introspection_cpp.hpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__type_support.cpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/action/detail/rotate_absolute__rosidl_typesupport_introspection_cpp.hpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__rosidl_typesupport_introspection_cpp.hpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__type_support.cpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__type_support.cpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__rosidl_typesupport_introspection_cpp.hpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_relative__rosidl_typesupport_introspection_cpp.hpp
+[3.336s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/kill__rosidl_typesupport_introspection_cpp.hpp
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/spawn__type_support.cpp
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__rosidl_typesupport_introspection_cpp.hpp
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/set_pen__type_support.cpp
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/include/turtlesim/turtlesim/srv/detail/teleport_absolute__type_support.cpp
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_typesupport_introspection_cpp.so
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_typesupport_cpp.so
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/pythonpath.sh
+[3.337s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/pythonpath.dsv
+[3.337s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim-1.4.2-py3.10.egg-info
+[3.337s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim-1.4.2-py3.10.egg-info/SOURCES.txt
+[3.338s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim-1.4.2-py3.10.egg-info/dependency_links.txt
+[3.338s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim-1.4.2-py3.10.egg-info/top_level.txt
+[3.338s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim-1.4.2-py3.10.egg-info/PKG-INFO
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/turtlesim_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/_turtlesim_s.ep.rosidl_typesupport_c.c
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/_turtlesim_s.ep.rosidl_typesupport_introspection_c.c
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/msg
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/msg/_color_s.c
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/msg/_pose.py
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/msg/_color.py
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/msg/_pose_s.c
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/msg/__init__.py
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/_turtlesim_s.ep.rosidl_typesupport_fastrtps_c.c
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/libturtlesim__rosidl_generator_py.so
+[3.338s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/turtlesim_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/action
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/action/_rotate_absolute_s.c
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/action/_rotate_absolute.py
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/action/__init__.py
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/turtlesim_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[3.339s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/__init__.py
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_spawn.py
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_teleport_absolute_s.c
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_kill.py
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_kill_s.c
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_set_pen_s.c
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/__init__.py
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_spawn_s.c
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_teleport_relative_s.c
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_teleport_absolute.py
+[3.339s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_teleport_relative.py
+[3.340s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv/_set_pen.py
+[3.366s] Listing '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim'...
+[3.366s] Compiling '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/__init__.py'...
+[3.366s] Listing '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/action'...
+[3.366s] Listing '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/msg'...
+[3.366s] Listing '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/srv'...
+[3.370s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/turtlesim_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+[3.370s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/turtlesim_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+[3.370s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/local/lib/python3.10/dist-packages/turtlesim/turtlesim_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/libturtlesim__rosidl_generator_py.so
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/action/RotateAbsolute.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/msg/Color.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/msg/Pose.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Kill.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/SetPen.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Spawn.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportAbsolute.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportRelative.idl
+[3.371s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/action/RotateAbsolute.action
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/msg/Color.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/msg/Pose.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Kill.srv
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Kill_Request.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Kill_Response.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/SetPen.srv
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/SetPen_Request.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/SetPen_Response.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Spawn.srv
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Spawn_Request.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/Spawn_Response.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportAbsolute.srv
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportAbsolute_Request.msg
+[3.372s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportAbsolute_Response.msg
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportRelative.srv
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportRelative_Request.msg
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/srv/TeleportRelative_Response.msg
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/turtlesim/turtlesim_node
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/turtlesim/turtle_teleop_key
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/turtlesim/draw_square
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/lib/turtlesim/mimic
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/eyantra.png
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/rolling.png
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/dashing.png
+[3.373s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/eloquent.png
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/foxy.png
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/galactic.png
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/bouncy.png
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/humble.png
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/crystal.png
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/images/ardent.png
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/launch
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/launch/multisim.launch.py
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/ament_index/resource_index/package_run_dependencies/turtlesim
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/ament_index/resource_index/parent_prefix_path/turtlesim
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/ament_prefix_path.sh
+[3.374s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/ament_prefix_path.dsv
+[3.374s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/path.sh
+[3.374s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/environment/path.dsv
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/local_setup.bash
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/local_setup.sh
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/local_setup.zsh
+[3.375s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/local_setup.dsv
+[3.375s] -- Installing: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/package.dsv
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/ament_index/resource_index/packages/turtlesim
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_generator_cExport.cmake
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_generator_cExport-noconfig.cmake
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_typesupport_fastrtps_cExport.cmake
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_generator_cppExport.cmake
+[3.375s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_typesupport_fastrtps_cppExport.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_introspection_cExport.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_cExport.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_cExport-noconfig.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_introspection_cppExport.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_cppExport.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesim__rosidl_typesupport_cppExport-noconfig.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_generator_pyExport.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/export_turtlesim__rosidl_generator_pyExport-noconfig.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/rosidl_cmake-extras.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/ament_cmake_export_dependencies-extras.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/ament_cmake_export_include_directories-extras.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/ament_cmake_export_libraries-extras.cmake
+[3.376s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/ament_cmake_export_targets-extras.cmake
+[3.377s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[3.377s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[3.377s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesimConfig.cmake
+[3.377s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/cmake/turtlesimConfig-version.cmake
+[3.377s] -- Up-to-date: /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/turtlesim/share/turtlesim/package.xml
+[3.382s] Invoked command in '/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/install/hb_task_1a:/opt/ros/humble /home/aswarth/.local/bin/cmake --install /home/aswarth/eyantra/eyrc_hb/hb_task1a_ws/build/turtlesim
