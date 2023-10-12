@@ -1,3 +1,0 @@
-[console_scripts]
-publisher_turt = hb_task_1a.task_1a_1036:main
-
