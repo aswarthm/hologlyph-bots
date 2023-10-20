@@ -28,7 +28,8 @@ from ament_index_python.packages import get_package_share_directory,get_package_
 
 
 def generate_launch_description():
-    share_dir = get_package_share_directory('hb_task2a')
+    pkg_name = 'hb_task2a'
+    share_dir = get_package_share_directory(pkg_name)
     pkg_sim_world = get_package_share_directory('hb_world')
     pkg_sim_bot = get_package_share_directory('hb_bot')
 
@@ -39,14 +40,19 @@ def generate_launch_description():
             os.path.join(pkg_sim_world, 'launch', 'world.launch.py'),
         )
     )
-    spwan_bot=IncludeLaunchDescription(
+    spawn_bot=IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_sim_bot, 'launch', 'Spawn_bot.launch.py'),
         )
     )
+    feedback=Node(
+        package=pkg_name,           # Enter the name of your ROS2 package
+        executable="feedback.py",    # Enter the name of your executable
+    )
     return LaunchDescription([
         world,
-        spwan_bot
+        spawn_bot,
+        feedback,
   
         
         ])

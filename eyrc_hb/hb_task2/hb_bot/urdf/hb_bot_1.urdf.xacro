@@ -331,7 +331,17 @@
             <robotBaseFrame>footprint_link</robotBaseFrame>
         </plugin>
     </gazebo>
- 
+     <gazebo>
+        <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+        <commandTopic>cmd_vel</commandTopic>
+        <odometryTopic>odom</odometryTopic>
+        <odometryFrame>odom</odometryFrame>
+        <odometryRate>20.0</odometryRate>
+        <robotBaseFrame>chasis</robotBaseFrame>
+        
+        <publish_odom>true</publish_odom>
+        </plugin>
+    </gazebo>
    
 </robot>
 
