@@ -26,6 +26,10 @@ import cv2
 from cv_bridge import CvBridge
 import numpy as np
 
+from nav_msgs.msg import Odometry
+from math import sin, cos
+from tf_transformations import euler_from_quaternion
+
 # Import the required modules
 ##############################################################
 
@@ -52,10 +56,29 @@ class ArUcoDetector(Node):
                                                      "/camera/image_raw",
                                                      self.image_callback,
                                                      10)
+        #debug only
+        self.subscription = self.create_subscription(Odometry, 
+                                                        '/hb_bot_1/odom_pose',
+                                                        self.odometryCb,
+                                                        10)
         
         self.publisher = self.create_publisher(Pose2D,
                                                "/detectedAruco",
                                                10)
+        
+
+    def odometryCb(self, odom: Odometry):
+        (self.hb_x, self.hb_y, self.hb_theta) = self.getPose(odom)
+        # msg =  "cur" + str(round(self.hb_x, 2)) + "\t" + str(round(self.hb_y, 2)) + "\t" + str(round(self.hb_theta, 2))
+        # self.get_logger().info(msg)
+
+    def getPose(self, odom: Odometry):
+        orientation_q = odom.pose.pose.orientation
+        position = odom.pose.pose.position
+        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
+        (roll, pitch, yaw) = euler_from_quaternion(orientation_list)
+        # yaw = math.radians(yaw)
+        return position.x, position.y, yaw
 
     def image_callback(self, msg):
         # convert ROS image to opencv image
@@ -66,6 +89,12 @@ class ArUcoDetector(Node):
         ArucoCorners = {}
         ArucoMarkerAngles = {}
         corners, ids, rejected = self.arucoDetector.detectMarkers(img)
+        '''
+            id 1    bot
+            id 8    top left
+            id 10   top right
+            id 12   bott right
+        '''
         for i in range(0, ids.shape[0]):
             DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
 
@@ -85,17 +114,59 @@ class ArUcoDetector(Node):
         cv2.imshow("lol", img)
         cv2.waitKey(1)
 
-        self.get_logger().info(str(ArucoDetailsDict[int(ids[0][0])]))#################################################verify if bot coords is same as gazebo coords
+        # self.get_logger().info(str(ids))
 
-        botTwist = Pose2D()
-        botTwist.x = 0.0
-        botTwist.y = 0.0
-        botTwist.theta = 0.0
+        try:
+            bot_loc = ArucoDetailsDict[1] #get bot id's details
+            # msg = "aru" + str(round(bot_loc[0][0], 2)) + "\t" + str(round(bot_loc[0][1], 2)) + "\t" + str(round(bot_loc[1], 2))
+            # self.get_logger().info(msg)#################################################verify if bot coords is same as gazebo coords
+            # msg =  "cur" + str(round(self.hb_x, 2)) + "\t" + str(round(self.hb_y, 2)) + "\t" + str(round(self.hb_theta*180.0/math.pi, 2))
+            # self.get_logger().info(msg)
 
-        self.publisher.publish(botTwist)
+            arenaCenter = self.calibrateCenter(ArucoDetailsDict)
+
+            #skipping theta calibration, by assuming it doesnt matter, calibrate if required
+            botCenterX = bot_loc[0][0] - arenaCenter[0]
+            botCenterY = bot_loc[0][1] - arenaCenter[1]
+            msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
+            self.get_logger().info(msg)
+            self.publishBotLocation([botCenterX, botCenterY, bot_loc[1]]) #[x, y, theta]
+
+        except Exception as e:
+            #bot id not found or corner ids not found
+            #either publish panic message to stop bot or just pass, assume id will be detected in next loop
+            #better to stop bot as it will prevent it from rolling out of arena
+            # self.get_logger().error(str(e.message))
+            self.get_logger().error("Some Aruco Tags Were Not Detected")
 
         # Detect Aruco marker
         # Publish the bot coordinates to the topic  /detected_aruco
+    
+    def publishBotLocation(self, botLocation):
+        #botLocation = [x, y, theta]
+        botTwist = Pose2D()
+        botTwist.x = botLocation[0]
+        botTwist.y = botLocation[1]
+        botTwist.theta = botLocation[2]
+
+        self.publisher.publish(botTwist)
+
+    def calibrateCenter(self, ArucoDetailsDict):
+        #returns board center
+        tl = ArucoDetailsDict[8][0]
+        tr = ArucoDetailsDict[10][0]
+        br = ArucoDetailsDict[12][0]
+
+        centerX = tl[0] + (tr[0] - tl[0])/2.0
+        centerY = tr[1] + (br[1] - tr[1])/2.0
+        # msg = "centerX " + str(centerX) + " centerY " + str(centerY)
+
+        # msg = f'{tl[0]} {tl[1]}  {tr[0]} {tr[1]}  {br[0]} {br[1]}'
+        # msg = f'{tl[0]} {tr[0]} {centerX}'
+
+        # self.get_logger().info(msg)
+
+        return [centerX, centerY]
 
     def getOrientationDeg(self, DetectedArucoMarkers):
         ArucoMarkerAngles = {}
@@ -141,7 +212,7 @@ class ArUcoDetector(Node):
                 angle = np.arccos(np.inner([1, 0], [midpoint_x, midpoint_y])/np.linalg.norm([midpoint_x, midpoint_y]))*180.0/np.pi
 
             angle = round(angle, 2)
-            self.get_logger().info(str(angle))
+            # self.get_logger().info(str(angle))
             ArucoMarkerAngles[i] = angle
 
         # returning the angles of the ArUco markers in degrees as a dictionary
@@ -169,7 +240,7 @@ class ArUcoDetector(Node):
                      tl_tr_center_y), (255, 0, 0), thickn)
             display_offset = int(
                 math.sqrt((tl_tr_center_x - center[0])**2+(tl_tr_center_y - center[1])**2))
-            cv2.putText(image, str(ids), (center[0]+int(display_offset/2)+5,
+            cv2.putText(image, str(ids), (center[0]-int(display_offset/2)-5,
                         center[1]), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), thickn)
             angle = details[1]
             cv2.putText(image, str(
