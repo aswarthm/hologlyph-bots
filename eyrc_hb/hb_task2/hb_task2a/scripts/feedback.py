@@ -107,6 +107,7 @@ class ArUcoDetector(Node):
                 center, ArucoMarkerAngles[int(ids[i][0,])]]
             ArucoCorners[int(ids[i][0,])] = corners[i][0,]
 
+        # img = cv2.aruco.drawDetectedMarkers(image = img, corners = corners, ids=ids, borderColor=(0, 255, 0))
         img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
 
         # self.get_logger().info(str(rejected))
@@ -128,8 +129,8 @@ class ArUcoDetector(Node):
             #skipping theta calibration, by assuming it doesnt matter, calibrate if required
             botCenterX = bot_loc[0][0] - arenaCenter[0]
             botCenterY = bot_loc[0][1] - arenaCenter[1]
-            msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
-            self.get_logger().info(msg)
+            # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
+            # self.get_logger().info(msg)
             self.publishBotLocation([botCenterX, botCenterY, bot_loc[1]]) #[x, y, theta]
 
         except Exception as e:
@@ -188,21 +189,21 @@ class ArUcoDetector(Node):
                 else:
                     cnt += 1
                     if cnt == 2:
-                        midpoint_x = (midpoint_x + j[0,])/2
-                        midpoint_y = (midpoint_y + j[1,])/2
+                        midpoint_x = (midpoint_x + j[0,])/2.0
+                        midpoint_y = (midpoint_y + j[1,])/2.0
                         right_x = j[0,]
                         right_y = j[1,]
                     ans_x += j[0,]
                     ans_y += j[1,]
-            ans_x = int(ans_x/4)
-            ans_y = int(ans_y/4)
-            midpoint_x = int(midpoint_x)
-            midpoint_y = int(midpoint_y)
+            ans_x = ans_x/4.0
+            ans_y = ans_y/4.0
+            midpoint_x = midpoint_x
+            midpoint_y = midpoint_y
             midpoint_x = midpoint_x - ans_x
             midpoint_y = -(midpoint_y - ans_y)
 
-            ans_x = 0
-            ans_y = 0
+            ans_x = 0.0
+            ans_y = 0.0
 
             angle = 0.0
 
