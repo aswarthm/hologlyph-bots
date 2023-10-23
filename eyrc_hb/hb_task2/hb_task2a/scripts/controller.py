@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 
 '''
 *****************************************************************************************
@@ -31,11 +31,13 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Wrench
 from nav_msgs.msg import Odometry
 import time
 import math
 from tf_transformations import euler_from_quaternion
-from my_robot_interfaces.srv import NextGoal             
+from my_robot_interfaces.srv import NextGoal     
+from geometry_msgs.msg import Pose2D        
 
 # You can add more if required
 ##############################################################
@@ -53,6 +55,7 @@ from my_robot_interfaces.srv import NextGoal
 class HBController(Node):
     def __init__(self):
         super().__init__('hb_controller')
+        self.get_logger().info("controller start")
         
         # Initialze Publisher and Subscriber
         # NOTE: You are strictly NOT-ALLOWED to use "cmd_vel" or "odom" topics in this task
@@ -60,6 +63,22 @@ class HBController(Node):
 	    #   /hb_bot_1/left_wheel_force,
 	    #   /hb_bot_1/right_wheel_force,
 	    #   /hb_bot_1/left_wheel_force
+        self.subscription = self.create_subscription(Pose2D, 
+                                                    '/detectedAruco',
+                                                    self.odometryCb,
+                                                    10)
+        
+        self.left_wheel_publisher = self.create_publisher(Wrench,
+                                                          "/hb_bot_1/left_wheel_force",
+                                                          10)
+        
+        self.right_wheel_publisher = self.create_publisher(Wrench,
+                                                          "/hb_bot_1/right_wheel_force",
+                                                          10)
+        
+        self.rear_wheel_publisher = self.create_publisher(Wrench,
+                                                          "/hb_bot_1/rear_wheel_force",
+                                                          10)
 
 
 
@@ -67,13 +86,34 @@ class HBController(Node):
         # For maintaining control loop rate.
         self.rate = self.create_rate(100)
 
+        self.hb_x = 0.0
+        self.hb_y = 0.0
+        self.hb_theta = 0.0
+
+        self.kp = 1.2
+
+        self.left_force = 0.0
+        self.right_force = 0.0
+        self.rear_force = 0.0
+
+
 
         # client for the "next_goal" service
         self.cli = self.create_client(NextGoal, 'next_goal')      
+        while not self.cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Service not available, waiting...')
+
         self.req = NextGoal.Request() 
         self.index = 0
 
-    
+    def odometryCb(self, msg):
+        # self.get_logger().info(str(msg))
+
+        self.hb_x = msg.x
+        self.hb_y = msg.y
+        self.hb_theta = msg.theta
+
+
     # Method to create a request to the "next_goal" service
     def send_request(self, request_goal):
         self.req.request_goal = request_goal
@@ -90,6 +130,13 @@ class HBController(Node):
         ############################################
         pass
 
+    def publish_force_vectors(self):
+        force_left = Wrench()
+        force_left.force.y = 0.0
+        self.left_wheel_publisher.publish(force_left)
+        self.right_wheel_publisher.publish(force_left)
+        self.rear_wheel_publisher.publish(force_left)
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -102,6 +149,7 @@ def main(args=None):
     
     # Main loop
     while rclpy.ok():
+        
 
         # Check if the service call is done
         if hb_controller.future.done():
@@ -109,7 +157,7 @@ def main(args=None):
                 # response from the service call
                 response = hb_controller.future.result()
             except Exception as e:
-                hb_controller.get_logger().infselfo(
+                hb_controller.get_logger().info(
                     'Service call failed %r' % (e,))
             else:
                 #########           GOAL POSE             #########
@@ -118,8 +166,14 @@ def main(args=None):
                 theta_goal  = response.theta_goal
                 hb_controller.flag = response.end_of_list
                 ####################################################
+
+                hb_controller.get_logger().info(f'{x_goal} {y_goal} {theta_goal}')
                 
                 # Calculate Error from feedback
+
+                error_x = x_goal - hb_controller.hb_x
+                error_y = y_goal - hb_controller.hb_y
+                error_theta = theta_goal - hb_controller.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
 
@@ -128,6 +182,7 @@ def main(args=None):
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
 
                 # Apply appropriate force vectors
+                hb_controller.publish_force_vectors()
 
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
                         

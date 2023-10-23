@@ -45,14 +45,22 @@ def generate_launch_description():
             os.path.join(pkg_sim_bot, 'launch', 'Spawn_bot.launch.py'),
         )
     )
+    service=Node(
+        package=pkg_name,           # Enter the name of your ROS2 package
+        executable="service_node.py",    # Enter the name of your executable
+    )
     feedback=Node(
         package=pkg_name,           # Enter the name of your ROS2 package
         executable="feedback.py",    # Enter the name of your executable
     )
+    controller=Node(
+        package=pkg_name,           # Enter the name of your ROS2 package
+        executable="controller.py",    # Enter the name of your executable
+    )
     return LaunchDescription([
+        service,
         world,
         spawn_bot,
         feedback,
-  
-        
+        controller,        
         ])

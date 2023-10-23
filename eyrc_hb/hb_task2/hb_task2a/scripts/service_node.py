@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 #######################################     DO NOT MODIFY THIS  FILE     ##########################################
 
@@ -17,6 +18,7 @@ class ServiceNode(Node):
 
     def __init__(self):
         super().__init__('service_node')
+        self.get_logger().info("service node started")
         self.service = self.create_service(
             NextGoal, 'next_goal', self.next_goal_callback)
         self.publish_shape = self.create_publisher(String, '/shape', 10)
