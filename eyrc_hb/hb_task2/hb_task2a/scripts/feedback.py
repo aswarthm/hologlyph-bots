@@ -139,7 +139,6 @@ class ArUcoDetector(Node):
             botCenterX = bot_loc[0][0] - arenaCenter[0]
             botCenterY = bot_loc[0][1] - arenaCenter[1]
             # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
-            # self.get_logger().info(msg)
             self.publishBotLocation([botCenterX, botCenterY, bot_loc[1]]) #[x, y, theta]
 
         except Exception as e:
@@ -156,8 +155,11 @@ class ArUcoDetector(Node):
         #botLocation = [x, y, theta]
         botTwist = Pose2D()
         botTwist.x = botLocation[0]
-        botTwist.y = botLocation[1]
-        botTwist.theta = botLocation[2]
+        botTwist.y = -botLocation[1]
+        botTwist.theta = math.radians(botLocation[2])
+
+        # msg = "cal" + str(round(botLocation[0], 2)) + " " + str(round(botLocation[1], 2)) + " " + str(round(botLocation[2], 2))
+        # self.get_logger().info(msg)
 
         self.publisher.publish(botTwist)
 
@@ -221,7 +223,7 @@ class ArUcoDetector(Node):
             else:
                 angle = np.arccos(np.inner([1, 0], [midpoint_x, midpoint_y])/np.linalg.norm([midpoint_x, midpoint_y]))*180.0/np.pi
 
-            angle = round(angle, 2)
+            angle = round(angle-90.0, 2) # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller expects wrt y axis i.e. yaw
             # self.get_logger().info(str(angle))
             ArucoMarkerAngles[i] = angle
 

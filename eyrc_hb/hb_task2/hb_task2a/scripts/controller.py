@@ -37,7 +37,8 @@ import time
 import math
 from tf_transformations import euler_from_quaternion
 from my_robot_interfaces.srv import NextGoal     
-from geometry_msgs.msg import Pose2D        
+from geometry_msgs.msg import Pose2D    
+import numpy as np    
 
 # You can add more if required
 ##############################################################
@@ -79,6 +80,9 @@ class HBController(Node):
         self.rear_wheel_publisher = self.create_publisher(Wrench,
                                                           "/hb_bot_1/rear_wheel_force",
                                                           10)
+        self.cmd_vel_publisher = self.create_publisher(Twist,
+                                                          "/cmd_vel",
+                                                          10)
 
 
 
@@ -90,7 +94,8 @@ class HBController(Node):
         self.hb_y = 0.0
         self.hb_theta = 0.0
 
-        self.kp = 1.2
+        self.kp = 1.5 * 1/20.0 # 1/20.0 to "scale" values from aruco to gazebo coordinates, mainly to limit speed
+        self.ka = 1.8
 
         self.left_force = 0.0
         self.right_force = 0.0
@@ -105,6 +110,7 @@ class HBController(Node):
 
         self.req = NextGoal.Request() 
         self.index = 0
+        time.sleep(2)
 
     def odometryCb(self, msg):
         # self.get_logger().info(str(msg))
@@ -120,7 +126,7 @@ class HBController(Node):
         self.future = self.cli.call_async(self.req)
         
 
-    def inverse_kinematics():
+    def inverse_kinematics(self, velocity):
         ############ ADD YOUR CODE HERE ############
 
         # INSTRUCTIONS & HELP : 
@@ -128,14 +134,35 @@ class HBController(Node):
         #	Process it further to find what proportions of that effort should be given to 3 individuals wheels !!
         #	Publish the calculated efforts to actuate robot by applying force vectors on provided topics
         ############################################
-        pass
+        ik_matrix = np.array([
+                                [-1,1,0],
+                                [-1,-(math.cos(math.pi/3)),-math.sin(math.pi/3)],
+                                [-1,-(math.cos(math.pi/3)),(math.sin(math.pi/3))]
+                            ])
+        force = np.dot(ik_matrix, velocity).flatten()
 
-    def publish_force_vectors(self):
+        return force
+
+    def publish_force_vectors(self, force):
         force_left = Wrench()
-        force_left.force.y = 0.0
+        force_right = Wrench()
+        force_rear = Wrench()
+
+        force_left.force.y = force[0]
+        force_right.force.y = force[1]
+        force_rear.force.y = force[2]
+
         self.left_wheel_publisher.publish(force_left)
-        self.right_wheel_publisher.publish(force_left)
-        self.rear_wheel_publisher.publish(force_left)
+        self.right_wheel_publisher.publish(force_right)
+        self.rear_wheel_publisher.publish(force_rear)
+    
+    def publish_cmd_vel(self, velocity):
+        msg = Twist()
+        msg.angular.z = velocity[0]
+        msg.linear.x = velocity[1]
+        msg.linear.y = velocity[2]
+        self.cmd_vel_publisher.publish(msg)
+
 
 
 def main(args=None):
@@ -168,6 +195,7 @@ def main(args=None):
                 ####################################################
 
                 hb_controller.get_logger().info(f'{x_goal} {y_goal} {theta_goal}')
+                hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {hb_controller.hb_theta}')
                 
                 # Calculate Error from feedback
 
@@ -176,22 +204,55 @@ def main(args=None):
                 error_theta = theta_goal - hb_controller.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
+                frame = np.array([
+                                    [error_theta, error_x, error_y]
+                                 ])
 
+                # frame = np.array([
+                #                     [error_x, error_y, error_theta]
+                #                  ])
+                # rot_matrix = np.array([
+                #                         [math.cos(hb_controller.hb_theta), -math.sin(hb_controller.hb_theta), 0],
+                #                         [math.sin(hb_controller.hb_theta), math.cos(hb_controller.hb_theta), 0],
+                #                         [0, 0, 1],
+                #                       ])
+                body_error_x =  error_x*math.cos(hb_controller.hb_theta) + error_y*math.sin(hb_controller.hb_theta)
+                body_error_y = (-error_x*math.sin(hb_controller.hb_theta) + error_y*math.cos(hb_controller.hb_theta))
+                body_error_theta = error_theta
+
+                
+
+                rot_matrix = np.array([
+                                        [1, 0, 0],
+                                        [0, math.cos(hb_controller.hb_theta), -math.sin(hb_controller.hb_theta)],
+                                        [0, math.sin(hb_controller.hb_theta), math.cos(hb_controller.hb_theta)],
+                                      ])
+                global_error = np.dot(frame, rot_matrix).flatten()
+                # velocity = np.array([body_error_x, body_error_y, body_error_theta])*hb_controller.kp
+            
                 # Calculate the required velocity of bot for the next iteration(s)
                 
+                k = np.array([hb_controller.ka, hb_controller.kp, hb_controller.kp])
+                velocity = np.multiply(global_error, k)
+                hb_controller.get_logger().info(str(velocity))
+                hb_controller.publish_cmd_vel(velocity)
+                
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
+                
+                force = hb_controller.inverse_kinematics(velocity)
 
                 # Apply appropriate force vectors
-                hb_controller.publish_force_vectors()
+                # hb_controller.publish_force_vectors(force)
 
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
-                        
-                ############     DO NOT MODIFY THIS       #########
-                hb_controller.index += 1
-                if hb_controller.flag == 1 :
-                    hb_controller.index = 0
-                hb_controller.send_request(hb_controller.index)
-                ####################################################
+                
+                if(False):
+                    ############     DO NOT MODIFY THIS       #########
+                    hb_controller.index += 1
+                    if hb_controller.flag == 1 :
+                        hb_controller.index = 0
+                    hb_controller.send_request(hb_controller.index)
+                    ####################################################
 
         # Spin once to process callbacks
         rclpy.spin_once(hb_controller)
