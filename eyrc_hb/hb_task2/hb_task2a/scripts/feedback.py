@@ -83,12 +83,21 @@ class ArUcoDetector(Node):
     def image_callback(self, msg):
         # convert ROS image to opencv image
         img = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+
+        # sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+        sharpen_kernel = np.array([                                         #this works better
+                                    [0,-1,0], 
+                                    [-1,6,-1], 
+                                    [0,-1,0]
+                                  ])
+        img_sharp = cv2.filter2D(img, -1, sharpen_kernel)
+
         # self.get_logger().info(str(type(cv_image)))
         DetectedArucoMarkers = {}
         ArucoDetailsDict = {}
         ArucoCorners = {}
         ArucoMarkerAngles = {}
-        corners, ids, rejected = self.arucoDetector.detectMarkers(img)
+        corners, ids, rejected = self.arucoDetector.detectMarkers(img_sharp)
         '''
             id 1    bot
             id 8    top left
