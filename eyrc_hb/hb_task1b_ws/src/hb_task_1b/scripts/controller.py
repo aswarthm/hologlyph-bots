@@ -187,7 +187,7 @@ def main(args=None):
                 #########           GOAL POSE             #########
                 x_goal      = response.x_goal
                 y_goal      = response.y_goal
-                theta_goal  = response.theta_goal
+                theta_goal  = math.pi/2 # response.theta_goal
                 ebot_controller.flag = response.end_of_list
                 ####################################################
                 
@@ -211,8 +211,8 @@ def main(args=None):
                 # therefore the errors will have have to be calculated in body frame.
                 # 
                 # This is probably the crux of Task 1, figure this out and rest should be fine.
-                body_error_x =  global_error_x*cos(global_error_theta) - global_error_y*sin(global_error_theta)
-                body_error_y = global_error_x*sin(global_error_theta) + global_error_y*cos(global_error_theta)
+                body_error_x =  global_error_x*cos(ebot_controller.hb_theta) + global_error_y*sin(ebot_controller.hb_theta)
+                body_error_y = -global_error_x*sin(ebot_controller.hb_theta) + global_error_y*cos(ebot_controller.hb_theta)
                 body_error_theta = global_error_theta
                 # msg = f"x = {body_error_x} y = {body_error_y} theta = {body_error_theta}"
                 # ebot_controller.get_logger().info(msg)
