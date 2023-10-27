@@ -156,7 +156,7 @@ class ArUcoDetector(Node):
         botTwist = Pose2D()
         botTwist.x = botLocation[0]
         botTwist.y = -botLocation[1]
-        botTwist.theta = math.radians(botLocation[2])
+        botTwist.theta = math.radians(botLocation[2] + 4.24) ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
 
         # msg = "cal" + str(round(botLocation[0], 2)) + " " + str(round(botLocation[1], 2)) + " " + str(round(botLocation[2], 2))
         # self.get_logger().info(msg)
@@ -244,6 +244,7 @@ class ArUcoDetector(Node):
             # cv2.circle(image, (int(corner[1][0]), int(corner[1][1])), thickn, (0, 255, 0), -1)
             # cv2.circle(image, (int(corner[2][0]), int(corner[2][1])), thickn, (128, 0, 255), -1)
             # cv2.circle(image, (int(corner[3][0]), int(corner[3][1])), thickn, (25, 255, 255), -1)
+            
 
             tl_tr_center_x = int((corner[0][0] + corner[1][0]) / 2)
             tl_tr_center_y = int((corner[0][1] + corner[1][1]) / 2)

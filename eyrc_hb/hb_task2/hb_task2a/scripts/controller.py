@@ -69,17 +69,16 @@ class HBController(Node):
                                                     self.odometryCb,
                                                     10)
         
+        self.rear_wheel_publisher = self.create_publisher(Wrench,
+                                                          "/hb_bot_1/rear_wheel_force",
+                                                          10)
         self.left_wheel_publisher = self.create_publisher(Wrench,
                                                           "/hb_bot_1/left_wheel_force",
-                                                          10)
-        
+                                                          10)        
         self.right_wheel_publisher = self.create_publisher(Wrench,
                                                           "/hb_bot_1/right_wheel_force",
                                                           10)
         
-        self.rear_wheel_publisher = self.create_publisher(Wrench,
-                                                          "/hb_bot_1/rear_wheel_force",
-                                                          10)
         self.cmd_vel_publisher = self.create_publisher(Twist,
                                                           "/cmd_vel",
                                                           10)
@@ -94,8 +93,11 @@ class HBController(Node):
         self.hb_y = 0.0
         self.hb_theta = 0.0
 
-        self.kp = 1.5 * 1/20.0 # 1/20.0 to "scale" values from aruco to gazebo coordinates, mainly to limit speed
+        self.kp = 1.5
         self.ka = 1.8
+
+        self.linear_tolerance = 5 # linear tolerance
+        self.angular_tolerance = math.radians(12) # degree tolerance
 
         self.left_force = 0.0
         self.right_force = 0.0
@@ -110,7 +112,6 @@ class HBController(Node):
 
         self.req = NextGoal.Request() 
         self.index = 0
-        time.sleep(2)
 
     def odometryCb(self, msg):
         # self.get_logger().info(str(msg))
@@ -134,27 +135,30 @@ class HBController(Node):
         #	Process it further to find what proportions of that effort should be given to 3 individuals wheels !!
         #	Publish the calculated efforts to actuate robot by applying force vectors on provided topics
         ############################################
+
         ik_matrix = np.array([
                                 [-1,1,0],
                                 [-1,-(math.cos(math.pi/3)),-math.sin(math.pi/3)],
                                 [-1,-(math.cos(math.pi/3)),(math.sin(math.pi/3))]
                             ])
+        # velocity is in the format [theta, x, y]
+        # force is in the format [rear_wheel, left_wheel, right_wheel]
         force = np.dot(ik_matrix, velocity).flatten()
 
         return force
 
     def publish_force_vectors(self, force):
+        force_rear = Wrench()
         force_left = Wrench()
         force_right = Wrench()
-        force_rear = Wrench()
 
-        force_left.force.y = force[0]
-        force_right.force.y = force[1]
-        force_rear.force.y = force[2]
+        force_rear.force.y = force[0]
+        force_left.force.y = force[1]
+        force_right.force.y = force[2]
 
+        self.rear_wheel_publisher.publish(force_rear)
         self.left_wheel_publisher.publish(force_left)
         self.right_wheel_publisher.publish(force_right)
-        self.rear_wheel_publisher.publish(force_rear)
     
     def publish_cmd_vel(self, velocity):
         msg = Twist()
@@ -162,6 +166,20 @@ class HBController(Node):
         msg.linear.x = velocity[1]
         msg.linear.y = velocity[2]
         self.cmd_vel_publisher.publish(msg)
+    
+    def goal_reached(self, frame):
+        error_theta = frame[0]
+
+        error_linear = math.sqrt(math.pow(frame[1], 2) + math.pow(frame[2], 2))
+        self.get_logger().info(str(error_linear))
+
+        if(abs(error_theta) < self.angular_tolerance and abs(error_linear) < self.linear_tolerance):
+            return True
+        
+        return False
+
+    def stop_bot(self):
+        self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
 
 
 
@@ -173,7 +191,7 @@ def main(args=None):
    
     # Send an initial request with the index from ebot_controller.index
     hb_controller.send_request(hb_controller.index)
-    
+
     # Main loop
     while rclpy.ok():
         
@@ -195,7 +213,7 @@ def main(args=None):
                 ####################################################
 
                 hb_controller.get_logger().info(f'{x_goal} {y_goal} {theta_goal}')
-                hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {hb_controller.hb_theta}')
+                hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
                 
                 # Calculate Error from feedback
 
@@ -204,9 +222,7 @@ def main(args=None):
                 error_theta = theta_goal - hb_controller.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
-                frame = np.array([
-                                    [error_theta, error_x, error_y]
-                                 ])
+                frame = np.array([-error_theta, error_x, error_y])
 
                 # frame = np.array([
                 #                     [error_x, error_y, error_theta]
@@ -216,9 +232,9 @@ def main(args=None):
                 #                         [math.sin(hb_controller.hb_theta), math.cos(hb_controller.hb_theta), 0],
                 #                         [0, 0, 1],
                 #                       ])
-                body_error_x =  error_x*math.cos(hb_controller.hb_theta) + error_y*math.sin(hb_controller.hb_theta)
-                body_error_y = (-error_x*math.sin(hb_controller.hb_theta) + error_y*math.cos(hb_controller.hb_theta))
-                body_error_theta = error_theta
+                # body_error_x =  error_x*math.cos(hb_controller.hb_theta) + error_y*math.sin(hb_controller.hb_theta)
+                # body_error_y = (-error_x*math.sin(hb_controller.hb_theta) + error_y*math.cos(hb_controller.hb_theta))
+                # body_error_theta = error_theta
 
                 
 
@@ -228,25 +244,28 @@ def main(args=None):
                                         [0, math.sin(hb_controller.hb_theta), math.cos(hb_controller.hb_theta)],
                                       ])
                 global_error = np.dot(frame, rot_matrix).flatten()
-                # velocity = np.array([body_error_x, body_error_y, body_error_theta])*hb_controller.kp
             
                 # Calculate the required velocity of bot for the next iteration(s)
                 
                 k = np.array([hb_controller.ka, hb_controller.kp, hb_controller.kp])
                 velocity = np.multiply(global_error, k)
                 hb_controller.get_logger().info(str(velocity))
-                hb_controller.publish_cmd_vel(velocity)
+                # hb_controller.publish_cmd_vel(velocity)
                 
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
                 
                 force = hb_controller.inverse_kinematics(velocity)
+                # force = hb_controller.inverse_kinematics(np.array([0, 0, 10]))
+                # hb_controller.get_logger().info(str(force))
 
                 # Apply appropriate force vectors
-                # hb_controller.publish_force_vectors(force)
+                hb_controller.publish_force_vectors(force)
 
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
                 
-                if(False):
+                if(hb_controller.goal_reached(frame)):
+                    # hb_controller.stop_bot()
+
                     ############     DO NOT MODIFY THIS       #########
                     hb_controller.index += 1
                     if hb_controller.flag == 1 :
