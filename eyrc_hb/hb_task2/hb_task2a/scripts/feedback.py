@@ -13,14 +13,20 @@
 *  Licensee/end user indemnifies and will keep e-Yantra indemnified from
 *  any and all claim(s) that emanate from the use of the Software or 
 *  breach of the terms of this agreement.
-*
-*  Team ID: 1036
-*  Team Leader Name: M Aswartha Reddy
-*  Team Members Name: M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad
-*  College: R. V. College of Engineering
-*
 *****************************************************************************************
 '''
+
+
+# Team ID:		    hb_1036
+# Author List:		[ M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad ]
+# Filename:		    feedback.py
+# Functions:
+#			[ Comma separated list of functions in this file ]
+# Nodes:		
+#                   Subs: [ /camera/image_raw ]
+#                   Pubs: [ /detectedAruco ]
+
+
 ################### IMPORT MODULES #######################
 import rclpy
 from rclpy.node import Node
@@ -68,60 +74,37 @@ class ArUcoDetector(Node):
         parameters = cv2.aruco.DetectorParameters()
         self.arucoDetector = cv2.aruco.ArucoDetector(arucoDict, parameters)
 
-        # self.DetectedArucoMarkers = {}
-        # self.ArUco_details_dict = {}
-        # self.ArUco_corners = {}
-        # self.ArUco_marker_angles = {}
-
         # Subscribe the topic /camera/image_raw
         self.subscription = self.create_subscription(sensor_msgs.msg.Image,
                                                      "/camera/image_raw",
                                                      self.image_callback,
                                                      10)
-        #debug only
-        self.subscription = self.create_subscription(Odometry, 
-                                                        '/hb_bot_1/odom_pose',
-                                                        self.odometryCb,
-                                                        10)
         
         self.publisher = self.create_publisher(Pose2D,
                                                "/detectedAruco",
                                                10)
 
         self.bot_path = []
-        
-
-    def odometryCb(self, odom: Odometry):
-        '''
-            Purpose:
-            ---
-            Callback function when 
-
-            Input Arguments:
-            ---
-            self:ArUcoDetector
-
-            Returns:
-            ---
-            None
-
-            Example call:
-            ---
-            -
-        '''
-        (self.hb_x, self.hb_y, self.hb_theta) = self.getPose(odom)
-        # msg =  "cur" + str(round(self.hb_x, 2)) + "\t" + str(round(self.hb_y, 2)) + "\t" + str(round(self.hb_theta, 2))
-        # self.get_logger().info(msg)
-
-    def getPose(self, odom: Odometry):
-        orientation_q = odom.pose.pose.orientation
-        position = odom.pose.pose.position
-        orientation_list = [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w]
-        (roll, pitch, yaw) = euler_from_quaternion(orientation_list)
-        # yaw = math.radians(yaw)
-        return position.x, position.y, yaw
 
     def image_callback(self, msg):
+        '''
+        Purpose:
+        ---
+        Callback function when new image is published by Gazebo. Calculates postion of markers on the arena, and publishes bot's location
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        msg:sensor_msgs.msg.Image Image as viewed by Gazebo Camera
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         # convert ROS image to opencv image
         img = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
@@ -133,7 +116,7 @@ class ArUcoDetector(Node):
                                   ])
         img_sharp = cv2.filter2D(img, -1, sharpen_kernel)
 
-        # self.get_logger().info(str(type(cv_image)))
+        # Detect Aruco marker
         DetectedArucoMarkers = {}
         ArucoDetailsDict = {}
         ArucoCorners = {}
@@ -149,7 +132,6 @@ class ArUcoDetector(Node):
             DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
 
         ArucoMarkerAngles = self.getOrientationDeg(DetectedArucoMarkers)
-        # ArucoMarkerAngles = self.Calculate_orientation_in_degree(DetectedArucoMarkers)
 
         for i in range(0, ids.shape[0]):
             center = np.mean(corners[i][0], axis=0)
@@ -165,6 +147,7 @@ class ArUcoDetector(Node):
 
         # self.get_logger().info(str(ids))
 
+        # Publish the bot coordinates to the topic  /detected_aruco
         try:
             bot_loc = ArucoDetailsDict[1] #get bot id's details
             # msg = "aru" + str(round(bot_loc[0][0], 2)) + "\t" + str(round(bot_loc[0][1], 2)) + "\t" + str(round(bot_loc[1], 2))
@@ -177,12 +160,13 @@ class ArUcoDetector(Node):
             #skipping theta calibration, by assuming it doesnt matter, calibrate if required
             botCenterX = bot_loc[0][0] - arenaCenter[0]
             botCenterY = bot_loc[0][1] - arenaCenter[1]
+            botTheta = bot_loc[1] + 4.24  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
 
             self.bot_path.append((int(bot_loc[0][0]), int(bot_loc[0][1])))
             # self.get_logger().info(str(self.bot_path))
 
             # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
-            self.publishBotLocation([botCenterX, botCenterY, bot_loc[1]]) #[x, y, theta]
+            self.publishBotLocation([botCenterX, botCenterY, botTheta]) #[x, y, theta]
 
         except KeyError as e:
             #bot id not found or corner ids not found
@@ -195,15 +179,31 @@ class ArUcoDetector(Node):
 
         cv2.imshow("lol", img)
         cv2.waitKey(1)
-        # Detect Aruco marker
-        # Publish the bot coordinates to the topic  /detected_aruco
     
     def publishBotLocation(self, botLocation):
-        #botLocation = [x, y, theta]
+        '''
+        Purpose:
+        ---
+        Publishes Bot's location and yaw
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        botLocation:List location of the bot in the format [x, y, theta]
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
+        #botLocation is in the format [x, y, theta]
         botTwist = Pose2D()
         botTwist.x = botLocation[0]
-        botTwist.y = -botLocation[1]
-        botTwist.theta = math.radians(botLocation[2] + 4.24) ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
+        botTwist.y = -botLocation[1] #idk why but '-' is required
+        botTwist.theta = math.radians(botLocation[2])
 
         # msg = "cal" + str(round(botLocation[0], 2)) + " " + str(round(botLocation[1], 2)) + " " + str(round(botLocation[2], 2))
         # self.get_logger().info(msg)
@@ -211,6 +211,24 @@ class ArUcoDetector(Node):
         self.publisher.publish(botTwist)
 
     def calibrateCenter(self, ArucoDetailsDict):
+        '''
+        Purpose:
+        ---
+        Calibrates center of arena by finding mid point of 3 aruco markers( tl, tr, br ) because "bl" isnt reliably detected
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        ArucoDetailsDict:List ############contunie from here
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         #returns board center
         tl = ArucoDetailsDict[8][0]
         tr = ArucoDetailsDict[10][0]
@@ -270,7 +288,7 @@ class ArUcoDetector(Node):
             else:
                 angle = np.arccos(np.inner([1, 0], [midpoint_x, midpoint_y])/np.linalg.norm([midpoint_x, midpoint_y]))*180.0/np.pi
 
-            angle = round(angle-90.0, 2) # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller expects wrt y axis i.e. yaw
+            angle = round(angle-90.0, 2) # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller probably expects wrt y axis i.e. yaw
             # self.get_logger().info(str(angle))
             ArucoMarkerAngles[i] = angle
 

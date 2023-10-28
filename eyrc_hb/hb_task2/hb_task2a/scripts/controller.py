@@ -18,12 +18,14 @@
 '''
 
 
-# Team ID:		[ Team-ID ]
-# Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
-# Filename:		feedback.py
+# Team ID:		    hb_1036
+# Author List:		[ M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad ]
+# Filename:		    controller.py
 # Functions:
 #			[ Comma separated list of functions in this file ]
-# Nodes:		Add your publishing and subscribing node
+# Nodes:		
+#                   Subs: [/detectedAruco]
+#                   Pubs: [ /hb_bot_1/rear_wheel_force, /hb_bot_1/left_wheel_force, /hb_bot_1/right_wheel_force ]
 
 
 ################### IMPORT MODULES #######################
@@ -55,6 +57,23 @@ import numpy as np
 # Define the HBController class, which is a ROS node
 class HBController(Node):
     def __init__(self):
+        '''
+            Purpose:
+            ---
+            Called when the HBController Node is initialised
+
+            Input Arguments:
+            ---
+            self:HBController
+
+            Returns:
+            ---
+            None
+
+            Example call:
+            ---
+            -
+        '''
         super().__init__('hb_controller')
         self.get_logger().info("controller start")
         
@@ -78,13 +97,6 @@ class HBController(Node):
         self.right_wheel_publisher = self.create_publisher(Wrench,
                                                           "/hb_bot_1/right_wheel_force",
                                                           10)
-        
-        self.cmd_vel_publisher = self.create_publisher(Twist,
-                                                          "/cmd_vel",
-                                                          10)
-
-
-
 
         # For maintaining control loop rate.
         self.rate = self.create_rate(100)
@@ -114,6 +126,24 @@ class HBController(Node):
         self.index = 0
 
     def odometryCb(self, msg):
+        '''
+        Purpose:
+        ---
+        Callback function when robot's position changes. Updates local variables with current x,y,theta
+
+        Input Arguments:
+        ---
+        self:HBController
+        odom:Pose2D updated odometry of robot
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         # self.get_logger().info(str(msg))
 
         self.hb_x = msg.x
@@ -123,11 +153,47 @@ class HBController(Node):
 
     # Method to create a request to the "next_goal" service
     def send_request(self, request_goal):
+        '''
+        Purpose:
+        ---
+        Helper function to make a request to the service node to get the next goal
+
+        Input Arguments:
+        ---
+        self:HBController
+        request_goal:Get the coordinates of "request_goal's" index
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         self.req.request_goal = request_goal
         self.future = self.cli.call_async(self.req)
         
 
     def inverse_kinematics(self, velocity):
+        '''
+        Purpose:
+        ---
+        Calculate inverse kinematics for the desired velocity
+
+        Input Arguments:
+        ---
+        self:HBController
+        velocity:numpy.ndarray in the format [theta, x, y]
+
+        Returns:
+        ---
+        force:numpy.ndarray in the format [rear_wheel, left_wheel, right_wheel]
+
+        Example call:
+        ---
+        -
+        '''
         ############ ADD YOUR CODE HERE ############
 
         # INSTRUCTIONS & HELP : 
@@ -148,6 +214,24 @@ class HBController(Node):
         return force
 
     def publish_force_vectors(self, force):
+        '''
+        Purpose:
+        ---
+        Publishes the forces to appropriate wheels, i.e. [rear, left, right]
+
+        Input Arguments:
+        ---
+        self:HBController
+        force:numpy.ndarray in the format [rear, left, right]
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         force_rear = Wrench()
         force_left = Wrench()
         force_right = Wrench()
@@ -160,14 +244,26 @@ class HBController(Node):
         self.left_wheel_publisher.publish(force_left)
         self.right_wheel_publisher.publish(force_right)
     
-    def publish_cmd_vel(self, velocity):
-        msg = Twist()
-        msg.angular.z = velocity[0]
-        msg.linear.x = velocity[1]
-        msg.linear.y = velocity[2]
-        self.cmd_vel_publisher.publish(msg)
-    
     def goal_reached(self, frame):
+        '''
+        Purpose:
+        ---
+        Checks if the bot is within acceptable limits, which tells if the bot has reached its goal
+
+        Input Arguments:
+        ---
+        self:HBController
+        frame:numpy.ndarray in the format [error_theta, error_x, error_y]
+
+        Returns:
+        ---
+        True if bot has reached goal
+        False otherwise
+
+        Example call:
+        ---
+        -
+        '''
         error_theta = frame[0]
 
         error_linear = math.sqrt(math.pow(frame[1], 2) + math.pow(frame[2], 2))
@@ -179,6 +275,23 @@ class HBController(Node):
         return False
 
     def stop_bot(self):
+        '''
+        Purpose:
+        ---
+        Stops the bot after reaching goal, or in case of an emergency
+
+        Input Arguments:
+        ---
+        self:HBController
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
 
 
@@ -194,7 +307,6 @@ def main(args=None):
 
     # Main loop
     while rclpy.ok():
-        
 
         # Check if the service call is done
         if hb_controller.future.done():
@@ -216,27 +328,12 @@ def main(args=None):
                 hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
                 
                 # Calculate Error from feedback
-
                 error_x = x_goal - hb_controller.hb_x
                 error_y = y_goal - hb_controller.hb_y
                 error_theta = theta_goal - hb_controller.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
                 frame = np.array([-error_theta, error_x, error_y])
-
-                # frame = np.array([
-                #                     [error_x, error_y, error_theta]
-                #                  ])
-                # rot_matrix = np.array([
-                #                         [math.cos(hb_controller.hb_theta), -math.sin(hb_controller.hb_theta), 0],
-                #                         [math.sin(hb_controller.hb_theta), math.cos(hb_controller.hb_theta), 0],
-                #                         [0, 0, 1],
-                #                       ])
-                # body_error_x =  error_x*math.cos(hb_controller.hb_theta) + error_y*math.sin(hb_controller.hb_theta)
-                # body_error_y = (-error_x*math.sin(hb_controller.hb_theta) + error_y*math.cos(hb_controller.hb_theta))
-                # body_error_theta = error_theta
-
-                
 
                 rot_matrix = np.array([
                                         [1, 0, 0],
@@ -246,23 +343,17 @@ def main(args=None):
                 global_error = np.dot(frame, rot_matrix).flatten()
             
                 # Calculate the required velocity of bot for the next iteration(s)
-                
                 k = np.array([hb_controller.ka, hb_controller.kp, hb_controller.kp])
                 velocity = np.multiply(global_error, k)
                 hb_controller.get_logger().info(str(velocity))
-                # hb_controller.publish_cmd_vel(velocity)
                 
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
-                
                 force = hb_controller.inverse_kinematics(velocity)
-                # force = hb_controller.inverse_kinematics(np.array([0, 0, 10]))
-                # hb_controller.get_logger().info(str(force))
 
                 # Apply appropriate force vectors
                 hb_controller.publish_force_vectors(force)
 
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
-                
                 if(hb_controller.goal_reached(frame)):
                     # hb_controller.stop_bot()
 
