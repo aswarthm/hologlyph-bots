@@ -14,6 +14,11 @@
 *  any and all claim(s) that emanate from the use of the Software or 
 *  breach of the terms of this agreement.
 *
+*  Team ID: 1036
+*  Team Leader Name: M Aswartha Reddy
+*  Team Members Name: M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad
+*  College: R. V. College of Engineering
+*
 *****************************************************************************************
 '''
 ################### IMPORT MODULES #######################
@@ -37,6 +42,23 @@ from tf_transformations import euler_from_quaternion
 class ArUcoDetector(Node):
 
     def __init__(self):
+        '''
+            Purpose:
+            ---
+            Called when the ArucoDetector Node is initialised
+
+            Input Arguments:
+            ---
+            self:ArUcoDetector
+
+            Returns:
+            ---
+            None
+
+            Example call:
+            ---
+            -
+        '''
         super().__init__('ar_uco_detector')
         self.get_logger().info("feedback start")
 
@@ -65,9 +87,28 @@ class ArUcoDetector(Node):
         self.publisher = self.create_publisher(Pose2D,
                                                "/detectedAruco",
                                                10)
+
+        self.bot_path = []
         
 
     def odometryCb(self, odom: Odometry):
+        '''
+            Purpose:
+            ---
+            Callback function when 
+
+            Input Arguments:
+            ---
+            self:ArUcoDetector
+
+            Returns:
+            ---
+            None
+
+            Example call:
+            ---
+            -
+        '''
         (self.hb_x, self.hb_y, self.hb_theta) = self.getPose(odom)
         # msg =  "cur" + str(round(self.hb_x, 2)) + "\t" + str(round(self.hb_y, 2)) + "\t" + str(round(self.hb_theta, 2))
         # self.get_logger().info(msg)
@@ -121,8 +162,6 @@ class ArUcoDetector(Node):
 
         # self.get_logger().info(str(rejected))
         # img = self.mark_ArUco_image(img, self.DetectedArucoMarkers, self.DetectedArucoMarkers)
-        cv2.imshow("lol", img)
-        cv2.waitKey(1)
 
         # self.get_logger().info(str(ids))
 
@@ -138,16 +177,24 @@ class ArUcoDetector(Node):
             #skipping theta calibration, by assuming it doesnt matter, calibrate if required
             botCenterX = bot_loc[0][0] - arenaCenter[0]
             botCenterY = bot_loc[0][1] - arenaCenter[1]
+
+            self.bot_path.append((int(bot_loc[0][0]), int(bot_loc[0][1])))
+            # self.get_logger().info(str(self.bot_path))
+
             # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
             self.publishBotLocation([botCenterX, botCenterY, bot_loc[1]]) #[x, y, theta]
 
-        except Exception as e:
+        except KeyError as e:
             #bot id not found or corner ids not found
             #either publish panic message to stop bot or just pass, assume id will be detected in next loop
             #better to stop bot as it will prevent it from rolling out of arena
             # self.get_logger().error(str(e.message))
             self.get_logger().error("Some Aruco Tags Were Not Detected")
+        except Exception as e:
+            self.get_logger().error(str(e))
 
+        cv2.imshow("lol", img)
+        cv2.waitKey(1)
         # Detect Aruco marker
         # Publish the bot coordinates to the topic  /detected_aruco
     
@@ -239,12 +286,16 @@ class ArUcoDetector(Node):
             cv2.circle(image, center, thickn, (0, 0, 255), -1)
 
             corner = ArucoCorners[int(ids)]
-            cv2.circle(image, (int(corner[0][0]), int(
-                corner[0][1])), thickn, (50, 50, 255), -1)
+            cv2.circle(image, (int(corner[0][0]), int(corner[0][1])), thickn, (50, 50, 255), -1)
             # cv2.circle(image, (int(corner[1][0]), int(corner[1][1])), thickn, (0, 255, 0), -1)
             # cv2.circle(image, (int(corner[2][0]), int(corner[2][1])), thickn, (128, 0, 255), -1)
             # cv2.circle(image, (int(corner[3][0]), int(corner[3][1])), thickn, (25, 255, 255), -1)
             
+            
+            for index, item in enumerate(self.bot_path): 
+                if index == len(self.bot_path) -1:
+                    break
+                cv2.line(image, item, self.bot_path[index + 1], [0, 255, 0], 2)
 
             tl_tr_center_x = int((corner[0][0] + corner[1][0]) / 2)
             tl_tr_center_y = int((corner[0][1] + corner[1][1]) / 2)

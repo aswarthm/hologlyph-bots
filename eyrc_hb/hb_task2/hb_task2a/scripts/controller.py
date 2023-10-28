@@ -93,8 +93,8 @@ class HBController(Node):
         self.hb_y = 0.0
         self.hb_theta = 0.0
 
-        self.kp = 1.5
-        self.ka = 1.8
+        self.kp = 3.5 #1.5
+        self.ka = 2.8 #1.8
 
         self.linear_tolerance = 5 # linear tolerance
         self.angular_tolerance = math.radians(12) # degree tolerance
@@ -212,7 +212,7 @@ def main(args=None):
                 hb_controller.flag = response.end_of_list
                 ####################################################
 
-                hb_controller.get_logger().info(f'{x_goal} {y_goal} {theta_goal}')
+                hb_controller.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
                 hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
                 
                 # Calculate Error from feedback
