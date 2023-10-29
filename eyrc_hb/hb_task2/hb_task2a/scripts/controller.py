@@ -106,7 +106,7 @@ class HBController(Node):
         self.hb_theta = 0.0
 
         self.kp = 3.5 #1.5
-        self.ka = 2.8 #1.8
+        self.ka = 28.0 #2.8 #1.8
 
         self.linear_tolerance = 5 # linear tolerance
         self.angular_tolerance = math.radians(12) # degree tolerance
@@ -169,7 +169,7 @@ class HBController(Node):
 
         Example call:
         ---
-        -
+        hb_controller.send_request(hb_controller.index)
         '''
         self.req.request_goal = request_goal
         self.future = self.cli.call_async(self.req)
@@ -192,7 +192,7 @@ class HBController(Node):
 
         Example call:
         ---
-        -
+        force = hb_controller.inverse_kinematics(velocity)
         '''
         ############ ADD YOUR CODE HERE ############
 
@@ -230,7 +230,7 @@ class HBController(Node):
 
         Example call:
         ---
-        -
+        hb_controller.publish_force_vectors(force)
         '''
         force_rear = Wrench()
         force_left = Wrench()
@@ -262,7 +262,8 @@ class HBController(Node):
 
         Example call:
         ---
-        -
+        if(hb_controller.goal_reached(frame)):
+            # do something
         '''
         error_theta = frame[0]
 
@@ -290,7 +291,7 @@ class HBController(Node):
 
         Example call:
         ---
-        -
+        hb_controller.stop_bot()
         '''
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
 

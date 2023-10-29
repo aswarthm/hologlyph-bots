@@ -179,73 +179,26 @@ class ArUcoDetector(Node):
 
         cv2.imshow("lol", img)
         cv2.waitKey(1)
-    
-    def publishBotLocation(self, botLocation):
-        '''
-        Purpose:
-        ---
-        Publishes Bot's location and yaw
-
-        Input Arguments:
-        ---
-        self:ArUcoDetector
-        botLocation:List location of the bot in the format [x, y, theta]
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        -
-        '''
-        #botLocation is in the format [x, y, theta]
-        botTwist = Pose2D()
-        botTwist.x = botLocation[0]
-        botTwist.y = -botLocation[1] #idk why but '-' is required
-        botTwist.theta = math.radians(botLocation[2])
-
-        # msg = "cal" + str(round(botLocation[0], 2)) + " " + str(round(botLocation[1], 2)) + " " + str(round(botLocation[2], 2))
-        # self.get_logger().info(msg)
-
-        self.publisher.publish(botTwist)
-
-    def calibrateCenter(self, ArucoDetailsDict):
-        '''
-        Purpose:
-        ---
-        Calibrates center of arena by finding mid point of 3 aruco markers( tl, tr, br ) because "bl" isnt reliably detected
-
-        Input Arguments:
-        ---
-        self:ArUcoDetector
-        ArucoDetailsDict:List ############contunie from here
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        -
-        '''
-        #returns board center
-        tl = ArucoDetailsDict[8][0]
-        tr = ArucoDetailsDict[10][0]
-        br = ArucoDetailsDict[12][0]
-
-        centerX = tl[0] + (tr[0] - tl[0])/2.0
-        centerY = tr[1] + (br[1] - tr[1])/2.0
-        # msg = "centerX " + str(centerX) + " centerY " + str(centerY)
-
-        # msg = f'{tl[0]} {tl[1]}  {tr[0]} {tr[1]}  {br[0]} {br[1]}'
-        # msg = f'{tl[0]} {tr[0]} {centerX}'
-
-        # self.get_logger().info(msg)
-
-        return [centerX, centerY]
 
     def getOrientationDeg(self, DetectedArucoMarkers):
+        '''
+        Purpose:
+        ---
+        Calculates the angle of aruco marker based on the slopes of sides. Angle is wrt y axis
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        DetectedArucoMarkers:List
+
+        Returns:
+        ---
+        ArucoMarkerAngles:List Contains the angles of all the detected aruco markers in degrees
+
+        Example call:
+        ---
+        ArucoMarkerAngles = self.getOrientationDeg(DetectedArucoMarkers)
+        '''
         ArucoMarkerAngles = {}
         cnt = 0
         ans_x = 0
@@ -288,15 +241,69 @@ class ArUcoDetector(Node):
             else:
                 angle = np.arccos(np.inner([1, 0], [midpoint_x, midpoint_y])/np.linalg.norm([midpoint_x, midpoint_y]))*180.0/np.pi
 
-            angle = round(angle-90.0, 2) # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller probably expects wrt y axis i.e. yaw
+            angle = round(angle-90.0, 2) # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller (probably) expects wrt y axis i.e. yaw
             # self.get_logger().info(str(angle))
             ArucoMarkerAngles[i] = angle
 
         # returning the angles of the ArUco markers in degrees as a dictionary
         return ArucoMarkerAngles
 
-    def mark_ArUco_image(self, image, ArucoDetailsDict, ArucoCorners):
+    def calibrateCenter(self, ArucoDetailsDict):
+        '''
+        Purpose:
+        ---
+        Calibrates center of arena by finding mid point of 3 aruco markers( tl, tr, br ) because "bl" isnt reliably detected
 
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        ArucoDetailsDict:List
+
+        Returns:
+        ---
+        List: [centerX, centerY] Calibrated values of arena's center
+
+        Example call:
+        ---
+        arenaCenter = self.calibrateCenter(ArucoDetailsDict)
+        '''
+        #returns board center
+        tl = ArucoDetailsDict[8][0]
+        tr = ArucoDetailsDict[10][0]
+        br = ArucoDetailsDict[12][0]
+
+        centerX = tl[0] + (tr[0] - tl[0])/2.0
+        centerY = tr[1] + (br[1] - tr[1])/2.0
+        # msg = "centerX " + str(centerX) + " centerY " + str(centerY)
+
+        # msg = f'{tl[0]} {tl[1]}  {tr[0]} {tr[1]}  {br[0]} {br[1]}'
+        # msg = f'{tl[0]} {tr[0]} {centerX}'
+
+        # self.get_logger().info(msg)
+
+        return [centerX, centerY]
+
+    def mark_ArUco_image(self, image, ArucoDetailsDict, ArucoCorners):
+        '''
+        Purpose:
+        ---
+        Helper function to draw aruco marker ID's, rotation of the marker and path of bot
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        image: Image captuered by gazebo camera 
+        ArucoDetailsDict: Dictionary containing aruco marker ids and center
+        ArucoCorners: Dictionary containing corners of detected aruco markers
+
+        Returns:
+        ---
+        image: Image with the extra details overlayed
+
+        Example call:
+        ---
+        img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
+        '''
         for ids, details in ArucoDetailsDict.items():
             center = details[0]
             center = [int(center[0]), int(center[1])]
@@ -329,6 +336,35 @@ class ArUcoDetector(Node):
                 angle), (center[0]-display_offset, center[1]+10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
         return image
 
+    def publishBotLocation(self, botLocation):
+        '''
+        Purpose:
+        ---
+        Publishes Bot's location and yaw
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        botLocation:List location of the bot in the format [x, y, theta]
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        self.publishBotLocation([botCenterX, botCenterY, botTheta])
+        '''
+        #botLocation is in the format [x, y, theta]
+        botTwist = Pose2D()
+        botTwist.x = botLocation[0]
+        botTwist.y = -botLocation[1] #idk why but '-' is required
+        botTwist.theta = math.radians(botLocation[2])
+
+        # msg = "cal" + str(round(botLocation[0], 2)) + " " + str(round(botLocation[1], 2)) + " " + str(round(botLocation[2], 2))
+        # self.get_logger().info(msg)
+
+        self.publisher.publish(botTwist)
 
 def main(args=None):
     rclpy.init(args=args)
