@@ -124,7 +124,6 @@ class ArUcoDetector(Node):
         corners, ids, rejected = self.arucoDetector.detectMarkers(img_sharp)
         '''
             id 1    bot
-            id 4    bott left
             id 8    top left
             id 10   top right
             id 12   bott right
@@ -159,11 +158,12 @@ class ArUcoDetector(Node):
             arenaCenter = self.calibrateCenter(ArucoDetailsDict)
 
             #skipping theta calibration, by assuming it doesnt matter, calibrate if required
-            botCenterX = float(bot_loc[0][0] - arenaCenter[0])
-            botCenterY = float(bot_loc[0][1] - arenaCenter[1])
-            botTheta = float(bot_loc[1] + 4.24)  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
+            botCenterX = bot_loc[0][0] - arenaCenter[0]
+            botCenterY = bot_loc[0][1] - arenaCenter[1]
+            botTheta = bot_loc[1] + 4.24  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
 
             self.bot_path.append((int(bot_loc[0][0]), int(bot_loc[0][1])))
+            # self.get_logger().info(str(self.bot_path))
 
             # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
             self.publishBotLocation([botCenterX, botCenterY, botTheta]) #[x, y, theta]
@@ -174,8 +174,8 @@ class ArUcoDetector(Node):
             #better to stop bot as it will prevent it from rolling out of arena
             # self.get_logger().error(str(e.message))
             self.get_logger().error("Some Aruco Tags Were Not Detected")
-        # except Exception as e:
-        #     self.get_logger().error(str(e))
+        except Exception as e:
+            self.get_logger().error(str(e))
 
         cv2.imshow("lol", img)
         cv2.waitKey(1)
@@ -268,17 +268,12 @@ class ArUcoDetector(Node):
         arenaCenter = self.calibrateCenter(ArucoDetailsDict)
         '''
         #returns board center
-        bl = ArucoDetailsDict[4][0]
         tl = ArucoDetailsDict[8][0]
         tr = ArucoDetailsDict[10][0]
         br = ArucoDetailsDict[12][0]
 
-        corners = np.array([bl, tl, tr, br])
-        centerX = corners.mean(axis=0)[0]
-        centerY = corners.mean(axis=0)[1]
-
-        # centerX = tl[0] + (tr[0] - tl[0])/2.0
-        # centerY = tr[1] + (br[1] - tr[1])/2.0
+        centerX = tl[0] + (tr[0] - tl[0])/2.0
+        centerY = tr[1] + (br[1] - tr[1])/2.0
         # msg = "centerX " + str(centerX) + " centerY " + str(centerY)
 
         # msg = f'{tl[0]} {tl[1]}  {tr[0]} {tr[1]}  {br[0]} {br[1]}'

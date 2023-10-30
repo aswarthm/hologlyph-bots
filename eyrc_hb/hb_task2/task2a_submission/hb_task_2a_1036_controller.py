@@ -108,8 +108,8 @@ class HBController(Node):
         self.kp = 3.5 #1.5
         self.ka = 28.0 #2.8 #1.8
 
-        self.linear_tolerance = 4 # linear tolerance
-        self.angular_tolerance = math.radians(8) # degree tolerance
+        self.linear_tolerance = 5 # linear tolerance
+        self.angular_tolerance = math.radians(12) # degree tolerance
 
         self.left_force = 0.0
         self.right_force = 0.0
@@ -203,9 +203,9 @@ class HBController(Node):
         ############################################
 
         ik_matrix = np.array([
-                                [-1.0,1.0,0.0],
-                                [-1.0,-math.cos(math.pi/3.0),-math.sin(math.pi/3.0)],
-                                [-1.0,-math.cos(math.pi/3.0),math.sin(math.pi/3.0)]
+                                [-1,1,0],
+                                [-1,-(math.cos(math.pi/3)),-math.sin(math.pi/3)],
+                                [-1,-(math.cos(math.pi/3)),(math.sin(math.pi/3))]
                             ])
         # velocity is in the format [theta, x, y]
         # force is in the format [rear_wheel, left_wheel, right_wheel]
@@ -271,7 +271,6 @@ class HBController(Node):
         self.get_logger().info(str(error_linear))
 
         if(abs(error_theta) < self.angular_tolerance and abs(error_linear) < self.linear_tolerance):
-        # if(abs(error_theta) < self.angular_tolerance and abs(frame[1]) < self.linear_tolerance and abs(frame[2]) < self.linear_tolerance):
             return True
         
         return False
