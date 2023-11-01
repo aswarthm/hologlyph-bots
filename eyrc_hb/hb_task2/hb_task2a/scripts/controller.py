@@ -101,14 +101,14 @@ class HBController(Node):
         # For maintaining control loop rate.
         self.rate = self.create_rate(100)
 
-        self.hb_x = 0.0
-        self.hb_y = 0.0
+        self.hb_x = 250.0
+        self.hb_y = 250.0
         self.hb_theta = 0.0
 
-        self.kp = 3.5 #1.5
-        self.ka = 28.0 #2.8 #1.8
+        self.kp = 4.5 #1.5 # 5.5 gives 78
+        self.ka = 18.0 #2.8 #1.8
 
-        self.linear_tolerance = 4 # linear tolerance
+        self.linear_tolerance = 3.5 # linear tolerance
         self.angular_tolerance = math.radians(8) # degree tolerance
 
         self.left_force = 0.0
@@ -320,8 +320,8 @@ def main(args=None):
                     'Service call failed %r' % (e,))
             else:
                 #########           GOAL POSE             #########
-                x_goal      = response.x_goal
-                y_goal      = response.y_goal
+                x_goal      = response.x_goal + 250.0
+                y_goal      = response.y_goal + 250.0
                 theta_goal  = response.theta_goal
                 hb_controller.flag = response.end_of_list
                 ####################################################

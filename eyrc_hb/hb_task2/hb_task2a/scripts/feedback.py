@@ -161,7 +161,7 @@ class ArUcoDetector(Node):
             #skipping theta calibration, by assuming it doesnt matter, calibrate if required
             botCenterX = float(bot_loc[0][0] - arenaCenter[0])
             botCenterY = float(bot_loc[0][1] - arenaCenter[1])
-            botTheta = float(bot_loc[1] + 4.24)  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
+            botTheta = float(bot_loc[1])  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
 
             self.bot_path.append((int(bot_loc[0][0]), int(bot_loc[0][1])))
 
@@ -274,8 +274,8 @@ class ArUcoDetector(Node):
         br = ArucoDetailsDict[12][0]
 
         corners = np.array([bl, tl, tr, br])
-        centerX = corners.mean(axis=0)[0]
-        centerY = corners.mean(axis=0)[1]
+        centerX = corners.mean(axis=0)[0] - 250.0
+        centerY = corners.mean(axis=0)[1] + 250.0
 
         # centerX = tl[0] + (tr[0] - tl[0])/2.0
         # centerY = tr[1] + (br[1] - tr[1])/2.0
