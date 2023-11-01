@@ -181,7 +181,6 @@ def main(args=None):
     rclpy.init(args=args)
     service_node = ServiceNode()
     shape_functions = ["generate_square", "generate_triangle", "generate_rectangle", "generate_hexagon", "generate_decagon"]
-    shape_functions = ["generate_decagon"]
     random_shape_function_name = random.choice(shape_functions)
 
     if random_shape_function_name   == "generate_rectangle":

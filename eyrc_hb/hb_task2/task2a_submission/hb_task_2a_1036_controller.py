@@ -105,8 +105,8 @@ class HBController(Node):
         self.hb_y = 250.0
         self.hb_theta = 0.0
 
-        self.kp = 4.5 #1.5 # 5.5 gives 78
-        self.ka = 18.0 #2.8 #1.8
+        self.kp = 5.5 #1.5 # 5.5 gives 78
+        self.ka = 28.0 #2.8 #1.8
 
         self.linear_tolerance = 3.5 # linear tolerance
         self.angular_tolerance = math.radians(8) # degree tolerance
@@ -339,8 +339,8 @@ def main(args=None):
 
                 rot_matrix = np.array([
                                         [1, 0, 0],
-                                        [0, math.cos(hb_controller.hb_theta), -math.sin(hb_controller.hb_theta)],
-                                        [0, math.sin(hb_controller.hb_theta), math.cos(hb_controller.hb_theta)],
+                                        [0, math.cos(hb_controller.hb_theta), math.sin(hb_controller.hb_theta)],
+                                        [0, math.sin(hb_controller.hb_theta), -math.cos(hb_controller.hb_theta)],
                                       ])
                 global_error = np.dot(frame, rot_matrix).flatten()
             
