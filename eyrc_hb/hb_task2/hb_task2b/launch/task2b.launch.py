@@ -39,12 +39,23 @@ def generate_launch_description():
             os.path.join(pkg_sim_world, 'launch', 'world.launch.py'),
         )
     )
-    spwan_bot=IncludeLaunchDescription(
+    spawn_bot=IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_sim_bot, 'launch', 'multi_bot_spawn.launch.py'),
         )
     )
+    goalPub = Node(
+            package='hb_task2b',
+            executable='nextGoalPub.py',
+        )
+    feedback = Node(
+            package='hb_task2b',
+            executable='feedback.py',
+        )
+
     return LaunchDescription([
         world,
-        spwan_bot
+        spawn_bot,
+        goalPub,
+        feedback
         ])
