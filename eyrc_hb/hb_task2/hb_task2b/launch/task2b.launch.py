@@ -51,11 +51,31 @@ def generate_launch_description():
     feedback = Node(
             package='hb_task2b',
             executable='feedback.py',
+        )        
+    controller = Node(
+            package='hb_task2b',
+            executable='bot_controller.py',
+        )
+    controller1 = Node(
+            package='hb_task2b',
+            executable='bot_controller_1.py',
+        )
+    controller2 = Node(
+            package='hb_task2b',
+            executable='bot_controller_2.py',
+        )
+    controller3 = Node(
+            package='hb_task2b',
+            executable='bot_controller_3.py',
         )
 
     return LaunchDescription([
         world,
         spawn_bot,
         goalPub,
-        feedback
+        feedback,
+        # controller,
+        controller1,
+        controller2,
+        controller3,
         ])

@@ -97,6 +97,9 @@ class HBController(Node):
         self.right_wheel_publisher = self.create_publisher(Wrench,
                                                           "/hb_bot_1/right_wheel_force",
                                                           10)
+        self.cmd_vel_publisher = self.create_publisher(Twist,
+                                                          "/hb_bot_1/cmd_vel",
+                                                          10)
 
         # For maintaining control loop rate.
         self.rate = self.create_rate(100)
@@ -105,8 +108,9 @@ class HBController(Node):
         self.hb_y = 250.0
         self.hb_theta = 0.0
 
-        self.kp = 4.0 #1.5 # 5.5 gives 78
-        self.ka = 10.0 #2.8 #1.8
+        self.k_mult = 40.0
+        self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
+        self.ka = 0.4*self.k_mult #2.8 #1.8
 
         self.linear_tolerance = 4.5 # linear tolerance
         self.angular_tolerance = math.radians(8) # degree tolerance
@@ -173,6 +177,13 @@ class HBController(Node):
         '''
         self.req.request_goal = request_goal
         self.future = self.cli.call_async(self.req)
+
+    def publish_cmd_vel(self, velocity):
+        msg = Twist()
+        msg.angular.z = velocity[0]
+        msg.linear.x = velocity[1]
+        msg.linear.y = velocity[2]
+        self.cmd_vel_publisher.publish(msg)
         
 
     def inverse_kinematics(self, velocity):
@@ -203,9 +214,9 @@ class HBController(Node):
         ############################################
 
         ik_matrix = np.array([
-                                [-1.0,1.0,0.0],
-                                [-1.0,-math.cos(math.pi/3.0),-math.sin(math.pi/3.0)],
-                                [-1.0,-math.cos(math.pi/3.0),math.sin(math.pi/3.0)]
+                                [1.0,1.0,0.0],
+                                [1.0,-math.cos(math.pi/3.0),-math.sin(math.pi/3.0)],
+                                [1.0,-math.cos(math.pi/3.0),math.sin(math.pi/3.0)]
                             ])
         # velocity is in the format [theta, x, y]
         # force is in the format [rear_wheel, left_wheel, right_wheel]
@@ -335,12 +346,12 @@ def main(args=None):
                 error_theta = theta_goal - hb_controller.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
-                frame = np.array([-error_theta, error_x, error_y])
+                frame = np.array([error_theta, error_x, error_y])
 
                 rot_matrix = np.array([
                                         [1, 0, 0],
-                                        [0, math.cos(hb_controller.hb_theta), math.sin(hb_controller.hb_theta)],
-                                        [0, math.sin(hb_controller.hb_theta), -math.cos(hb_controller.hb_theta)],
+                                        [0, math.cos(hb_controller.hb_theta), -math.sin(hb_controller.hb_theta)],
+                                        [0, -math.sin(hb_controller.hb_theta), -math.cos(hb_controller.hb_theta)],
                                       ])
                 global_error = np.dot(frame, rot_matrix).flatten()
             
@@ -348,6 +359,8 @@ def main(args=None):
                 k = np.array([hb_controller.ka, hb_controller.kp, hb_controller.kp])
                 velocity = np.multiply(global_error, k)
                 hb_controller.get_logger().info(str(velocity))
+
+                # hb_controller.publish_cmd_vel(velocity)
                 
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
                 force = hb_controller.inverse_kinematics(velocity)

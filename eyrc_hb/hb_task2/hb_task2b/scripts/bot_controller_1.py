@@ -42,7 +42,7 @@ import numpy as np
 
 
 
-bot_id = 2
+bot_id = 1
 
 class HBController(Node):
     def __init__(self):
@@ -107,6 +107,7 @@ class HBController(Node):
 
         # For maintaining control loop rate.
         self.rate = self.create_rate(100)
+
 
     def arucoCb(self, msg):
         '''
@@ -180,6 +181,9 @@ class HBController(Node):
             self.bot_theta_goal = msg.theta
 
             self.goalsReceived = True
+
+            for i in range(10):
+                time.sleep(0.4)
     
     def get_goal(self):
 
@@ -296,7 +300,7 @@ def main(args=None):
                 # response from the service call
                 response = hb_controller.get_goal()
             except Exception as e:
-                ##disable###disable#hb_controller.get_logger().info('Goal call failed %r' % (e,))
+                ##disable#hb_controller.get_logger().info('Goal call failed %r' % (e,))
                 pass
             else:
                 #########           GOAL POSE             #########
@@ -306,8 +310,8 @@ def main(args=None):
                 hb_controller.flag = response[3]
                 ####################################################
 
-                ##disable###disable#hb_controller.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
-                ##disable###disable#hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
+                ##disable#hb_controller.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
+                ##disable#hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
                 
                 # Calculate Error from feedback
                 error_x = x_goal - hb_controller.hb_x
@@ -323,13 +327,13 @@ def main(args=None):
                                         [0, -math.sin(hb_controller.hb_theta), -math.cos(hb_controller.hb_theta)],
                                       ])
                 global_error = np.dot(frame, rot_matrix).flatten()
-                # ##disable###disable#hb_controller.get_logger().info(str(global_error))
+                # ##disable#hb_controller.get_logger().info(str(global_error))
             
                 # Calculate the required velocity of bot for the next iteration(s)
                 k = np.array([hb_controller.ka, hb_controller.kp, hb_controller.kp])
                 velocity = np.multiply(global_error, k)
                 velocity = hb_controller.normalize_velocity(velocity)
-                ##disable###disable#hb_controller.get_logger().info(str(velocity))
+                ##disable#hb_controller.get_logger().info(str(velocity))
                 
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
                 force = hb_controller.inverse_kinematics(velocity)

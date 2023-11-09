@@ -47,7 +47,7 @@ bot_id = 2
 class HBController(Node):
     def __init__(self):
         super().__init__(f'hb_controller{bot_id}')
-        ##disable#self.get_logger().info(f"{bot_id} id controller start")
+        ##disable###disable#self.get_logger().info(f"{bot_id} id controller start")
 
         self.goalsReceived = False        
         self.index = 0
@@ -127,7 +127,7 @@ class HBController(Node):
         ---
         -
         '''
-        # ##disable#self.get_logger().info(str(msg))
+        # ##disable###disable#self.get_logger().info(str(msg))
         if(self.locationReceived == False):
             self.locationReceived = True
 
@@ -246,7 +246,7 @@ class HBController(Node):
         error_theta = frame[0]
 
         error_linear = math.sqrt(math.pow(frame[1], 2) + math.pow(frame[2], 2))
-        ##disable#self.get_logger().info(str(error_linear))
+        ##disable###disable#self.get_logger().info(str(error_linear))
 
         if(abs(error_theta) < self.angular_tolerance and abs(error_linear) < self.linear_tolerance):
         # if(abs(error_theta) < self.angular_tolerance and abs(frame[1]) < self.linear_tolerance and abs(frame[2]) < self.linear_tolerance):
@@ -296,7 +296,7 @@ def main(args=None):
                 # response from the service call
                 response = hb_controller.get_goal()
             except Exception as e:
-                ##disable###disable#hb_controller.get_logger().info('Goal call failed %r' % (e,))
+                ##disable#hb_controller.get_logger().info('Goal call failed %r' % (e,))
                 pass
             else:
                 #########           GOAL POSE             #########
@@ -306,8 +306,8 @@ def main(args=None):
                 hb_controller.flag = response[3]
                 ####################################################
 
-                ##disable###disable#hb_controller.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
-                ##disable###disable#hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
+                ##disable#hb_controller.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
+                ##disable#hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
                 
                 # Calculate Error from feedback
                 error_x = x_goal - hb_controller.hb_x
@@ -323,13 +323,13 @@ def main(args=None):
                                         [0, -math.sin(hb_controller.hb_theta), -math.cos(hb_controller.hb_theta)],
                                       ])
                 global_error = np.dot(frame, rot_matrix).flatten()
-                # ##disable###disable#hb_controller.get_logger().info(str(global_error))
+                # ##disable#hb_controller.get_logger().info(str(global_error))
             
                 # Calculate the required velocity of bot for the next iteration(s)
                 k = np.array([hb_controller.ka, hb_controller.kp, hb_controller.kp])
                 velocity = np.multiply(global_error, k)
                 velocity = hb_controller.normalize_velocity(velocity)
-                ##disable###disable#hb_controller.get_logger().info(str(velocity))
+                ##disable#hb_controller.get_logger().info(str(velocity))
                 
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
                 force = hb_controller.inverse_kinematics(velocity)
