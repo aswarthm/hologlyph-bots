@@ -42,12 +42,15 @@ import numpy as np
 
 
 
-bot_id = 2
+# bot_id = 2
 
 class HBController(Node):
-    def __init__(self):
-        super().__init__(f'hb_controller{bot_id}')
-        ##disable#self.get_logger().info(f"{bot_id} id controller start")
+    def __init__(self, bot_id):
+        self.bot_id = bot_id
+        super().__init__(f'hb_controller{self.bot_id}')
+        ##disable#self.get_logger().info(f"{self.bot_id} id controller start")
+
+        self.create_timer(0.1, self.timerCb)
 
         self.goalsReceived = False        
         self.index = 0
@@ -70,23 +73,23 @@ class HBController(Node):
 
         #Similar to this you can create subscribers for hb_bot_2 and hb_bot_3
         self.subscription_goal = self.create_subscription(Goal,  
-                                                     f'hb_bot_{bot_id}/goal',  
+                                                     f'hb_bot_{self.bot_id}/goal',  
                                                      self.goalCallBack,  # Callback function to handle received messages
                                                      10  # QoS profile, here it's 10 which means a buffer size of 10 messages
         )  
         self.subscription_aruco = self.create_subscription(Pose2D, 
-                                                    f'/detected_aruco_{bot_id}',
+                                                    f'/detected_aruco_{self.bot_id}',
                                                     self.arucoCb,
                                                     10)
         
         self.rear_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{bot_id}/rear_wheel_force",
+                                                          f"/hb_bot_{self.bot_id}/rear_wheel_force",
                                                           10)
         self.left_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{bot_id}/left_wheel_force",
+                                                          f"/hb_bot_{self.bot_id}/left_wheel_force",
                                                           10)        
         self.right_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{bot_id}/right_wheel_force",
+                                                          f"/hb_bot_{self.bot_id}/right_wheel_force",
                                                           10)
 
 
@@ -180,6 +183,11 @@ class HBController(Node):
             self.bot_theta_goal = msg.theta
 
             self.goalsReceived = True
+
+            time.sleep(self.bot_id*3) #add some delay before starting to prevent collision
+
+            # for i in range(5*self.bot_id):
+            #     time.sleep(0.4)
     
     def get_goal(self):
 
@@ -280,79 +288,97 @@ class HBController(Node):
         velocity[1] = max(-max_vel, min(velocity[1], max_vel))
         velocity[2] = max(-max_vel, min(velocity[2], max_vel))
         return velocity
-
-
-def main(args=None):
-    rclpy.init(args=args)
     
-    hb_controller = HBController()
-       
-    # Main loop
-    while rclpy.ok():
-
+    def timerCb(self):
         # Check if the goals have been received
-        if hb_controller.goalsReceived == True and hb_controller.locationReceived == True:
+        if self.goalsReceived == True and self.locationReceived == True:
             try:
                 # response from the service call
-                response = hb_controller.get_goal()
+                response = self.get_goal()
             except Exception as e:
-                ##disable###disable#hb_controller.get_logger().info('Goal call failed %r' % (e,))
+                ##disable###disable#self.get_logger().info('Goal call failed %r' % (e,))
                 pass
             else:
                 #########           GOAL POSE             #########
                 x_goal      = response[0] #+ 250.0
                 y_goal      = response[1] #+ 250.0
                 theta_goal  = response[2]
-                hb_controller.flag = response[3]
+                self.flag = response[3]
                 ####################################################
 
-                ##disable###disable#hb_controller.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
-                ##disable###disable#hb_controller.get_logger().info(f'cur {hb_controller.hb_x} {hb_controller.hb_y} {math.degrees(hb_controller.hb_theta)}')
+                ##disable###disable#self.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
+                ##disable###disable#self.get_logger().info(f'cur {self.hb_x} {self.hb_y} {math.degrees(self.hb_theta)}')
                 
                 # Calculate Error from feedback
-                error_x = x_goal - hb_controller.hb_x
-                error_y = y_goal - hb_controller.hb_y
-                error_theta = theta_goal - hb_controller.hb_theta
+                error_x = x_goal - self.hb_x
+                error_y = y_goal - self.hb_y
+                error_theta = theta_goal - self.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
                 frame = np.array([error_theta, error_x, error_y])
 
                 rot_matrix = np.array([
                                         [1, 0, 0],
-                                        [0, math.cos(hb_controller.hb_theta), -math.sin(hb_controller.hb_theta)],
-                                        [0, -math.sin(hb_controller.hb_theta), -math.cos(hb_controller.hb_theta)],
+                                        [0, math.cos(self.hb_theta), -math.sin(self.hb_theta)],
+                                        [0, -math.sin(self.hb_theta), -math.cos(self.hb_theta)],
                                       ])
                 global_error = np.dot(frame, rot_matrix).flatten()
-                # ##disable###disable#hb_controller.get_logger().info(str(global_error))
+                # ##disable###disable#self.get_logger().info(str(global_error))
             
                 # Calculate the required velocity of bot for the next iteration(s)
-                k = np.array([hb_controller.ka, hb_controller.kp, hb_controller.kp])
+                k = np.array([self.ka, self.kp, self.kp])
                 velocity = np.multiply(global_error, k)
-                velocity = hb_controller.normalize_velocity(velocity)
-                ##disable###disable#hb_controller.get_logger().info(str(velocity))
+                velocity = self.normalize_velocity(velocity)
+                ##disable###disable#self.get_logger().info(str(velocity))
                 
                 # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
-                force = hb_controller.inverse_kinematics(velocity)
+                force = self.inverse_kinematics(velocity)
 
                 # Apply appropriate force vectors
-                hb_controller.publish_force_vectors(force)
+                self.publish_force_vectors(force)
 
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
-                if(hb_controller.goal_reached(frame)):
-                    # hb_controller.stop_bot()
+                if(self.goal_reached(frame)):
+                    # self.stop_bot()
 
                     ############     DO NOT MODIFY THIS       #########
-                    hb_controller.index += 1
-                    if hb_controller.flag == 1 :
-                        hb_controller.index = 0
+                    self.index += 1
+                    if self.flag == 1 :
+                        self.index = 0
                     ####################################################
 
-        # Spin once to process callbacks
-        rclpy.spin_once(hb_controller)
-    
-    # Destroy the node and shut down ROS
-    hb_controller.destroy_node()
-    rclpy.shutdown()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    executor = rclpy.executors.MultiThreadedExecutor()
+
+    hb_controller_1 = HBController(bot_id=1)
+    hb_controller_2 = HBController(bot_id=2)
+    hb_controller_3 = HBController(bot_id=3)
+
+
+    executor.add_node(hb_controller_1)
+    executor.add_node(hb_controller_2)
+    executor.add_node(hb_controller_3)
+
+    try:
+        executor.spin()
+    finally:
+        executor.shutdown()
+        hb_controller_1.destroy_node()
+        hb_controller_2.destroy_node()
+        hb_controller_3.destroy_node()
+        rclpy.shutdown()
+       
+    # # Main loop
+    # while rclpy.ok():
+    #     # Spin once to process callbacks
+    #     rclpy.spin_once(hb_controller)
+    # # Destroy the node and shut down ROS
+    # hb_controller.destroy_node()
+    # rclpy.shutdown()
 
 # Entry point of the script
 if __name__ == '__main__':

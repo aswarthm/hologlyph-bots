@@ -74,8 +74,8 @@ def generate_launch_description():
         spawn_bot,
         goalPub,
         feedback,
-        # controller,
-        controller1,
-        controller2,
-        controller3,
+        controller,
+        # controller1,
+        # controller2,
+        # controller3,
         ])

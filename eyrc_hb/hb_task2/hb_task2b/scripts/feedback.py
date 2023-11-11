@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
 '''
+improve by calculating corners only once instead of calibrating everytime
+'''
+
+'''
 *****************************************************************************************
 *
 *        		===============================================
