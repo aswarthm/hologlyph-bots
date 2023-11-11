@@ -6,7 +6,7 @@
 *           		Hologlyph Bots (HB) Theme (eYRC 2023-24)
 *        		===============================================
 *
-*  This script is to implement Task 2A of Hologlyph Bots (HB) Theme (eYRC 2023-24).
+*  This script is to implement Task 2B of Hologlyph Bots (HB) Theme (eYRC 2023-24).
 *  
 *  This software is made available on an "AS IS WHERE IS BASIS".
 *  Licensee/end user indemnifies and will keep e-Yantra indemnified from
@@ -17,12 +17,14 @@
 '''
 
 
-# Team ID:		[ Team-ID ]
-# Author List:		[ Names of team members worked on this file separated by Comma: Name1, Name2, ... ]
-# Filename:		feedback.py
+# Team ID:		    hb_1036
+# Author List:		[ M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad ]
+# Filename:		    bot_controller.py
 # Functions:
 #			[ Comma separated list of functions in this file ]
-# Nodes:		Add your publishing and subscribing node
+# Nodes:		
+#                   Subs: [ 'hb_bot_{self.bot_id}/goal', '/detected_aruco_{self.bot_id}' ]
+#                   Pubs: [ "/hb_bot_{self.bot_id}/rear_wheel_force", "/hb_bot_{self.bot_id}/left_wheel_force", "/hb_bot_{self.bot_id}/right_wheel_force" ]
 
 
 ################### IMPORT MODULES #######################
@@ -177,6 +179,25 @@ class HBController(Node):
         return force
 
     def goalCallBack(self, msg):
+        '''
+        Purpose:
+        ---
+        Callback function when bew goals are received. Updates array with goals to be reached
+        Sleeps for a certian amount of time to prevent collision
+
+        Input Arguments:
+        ---
+        self:HBController
+        msg:Goal goal list of bot containing x, y and theta
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         if(self.goalsReceived == False):
             self.bot_x_goals = msg.x
             self.bot_y_goals = msg.y
@@ -190,7 +211,23 @@ class HBController(Node):
             #     time.sleep(0.4)
     
     def get_goal(self):
+        '''
+        Purpose:
+        ---
+        Returns the next goal for the bot and if all the goals have been reached i.e. end of list
 
+        Input Arguments:
+        ---
+        self:HBController
+
+        Returns:
+        ---
+        [goal_x, goal_y, goal_theta, end_of_list]
+
+        Example call:
+        ---
+        hb_controller.get_goal()
+        '''
         goal_x = self.bot_x_goals[self.index]
         goal_y = self.bot_y_goals[self.index]
         goal_theta = self.bot_theta_goal
@@ -283,6 +320,24 @@ class HBController(Node):
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
 
     def normalize_velocity(self, velocity):
+        '''
+        Purpose:
+        ---
+        Makes sure the velocities are within acceptable range to prevent unpredictable behaviour
+
+        Input Arguments:
+        ---
+        self:HBController
+        velocity: List
+
+        Returns:
+        ---
+        velocity: List
+
+        Example call:
+        ---
+        hb_controller.normalize_velocity(velocity)
+        '''
         max_vel = 60.0
 
         velocity[1] = max(-max_vel, min(velocity[1], max_vel))
@@ -290,6 +345,24 @@ class HBController(Node):
         return velocity
     
     def timerCb(self):
+        '''
+        Purpose:
+        ---
+        Callback function to run main loop of the controller
+        simplifies multi threading
+
+        Input Arguments:
+        ---
+        self:HBController
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
         # Check if the goals have been received
         if self.goalsReceived == True and self.locationReceived == True:
             try:
