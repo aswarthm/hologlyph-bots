@@ -1,0 +1,20 @@
+esp32 connect to 3 servos for omniwheel
+esp32 to 1 servo for pen up/down
+xl4015 12v->5v
+
+add switch for main power
+
+optional
+rgb led or neopixel to indicate status
+1 led for bot id - red, green, blue
+1 led for current status - function mode, image mode, stop, finished
+buzzer for fancy
+
+pwm pins
+3 for wheels 25, 26,27
+1 for pen 33
+6 for led (18, 19, 21), (4, 22, 32)
+
+digital pins
+1 for buzzer 23
+
