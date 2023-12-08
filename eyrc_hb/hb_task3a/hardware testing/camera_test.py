@@ -1,8 +1,10 @@
 import cv2 
+import time
   
   
 # define a video capture object 
 vid = cv2.VideoCapture(2) # check the number it can change according to hardware
+time.sleep(1)
   
 while(True): 
       
