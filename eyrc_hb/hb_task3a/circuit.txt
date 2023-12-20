@@ -5,7 +5,7 @@ xl4015 12v->5v
 add switch for main power
 
 optional
-rgb led or neopixel to indicate status
+rgb led to indicate status
 1 led for bot id - red, green, blue
 1 led for current status - function mode, image mode, stop, finished
 buzzer for fancy

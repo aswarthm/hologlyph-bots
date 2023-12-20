@@ -1,0 +1,23 @@
+%TF.GenerationSoftware,KiCad,Pcbnew,7.0.1*%
+%TF.CreationDate,2023-12-18T22:50:53+05:30*%
+%TF.ProjectId,hologlyph bot circuit,686f6c6f-676c-4797-9068-20626f742063,rev?*%
+%TF.SameCoordinates,Original*%
+%TF.FileFunction,Profile,NP*%
+%FSLAX46Y46*%
+G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
+G04 Created by KiCad (PCBNEW 7.0.1) date 2023-12-18 22:50:53*
+%MOMM*%
+%LPD*%
+G01*
+G04 APERTURE LIST*
+%TA.AperFunction,Profile*%
+%ADD10C,0.100000*%
+%TD*%
+G04 APERTURE END LIST*
+D10*
+X82910000Y-40130000D02*
+X168910000Y-40130000D01*
+X168910000Y-130130000D01*
+X82910000Y-130130000D01*
+X82910000Y-40130000D01*
+M02*
