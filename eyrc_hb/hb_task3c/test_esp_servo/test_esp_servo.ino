@@ -11,7 +11,7 @@ Servo micro_servo;
 #define servo2_pin  26
 #define servo3_pin  25
 #define servo_pin   33
-#define led_pin     LED_BUILTIN 
+#define led_pin     2
 
 void servo_init(){
   servo1.attach(servo1_pin);

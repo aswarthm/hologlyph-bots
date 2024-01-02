@@ -6,6 +6,19 @@ import numpy as np
 import math
 import time
 import cv_bridge
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Pose2D
+import sensor_msgs.msg
+import math
+import cv2
+from cv_bridge import CvBridge
+import numpy as np
+
+from nav_msgs.msg import Odometry
+from math import sin, cos
+from tf_transformations import euler_from_quaternion
+
 
 class camera_node(Node):
     def __init__(self):
@@ -15,16 +28,55 @@ class camera_node(Node):
             '/camera1/image_raw',
             self.image_callback,
             10)
+        
+        self.bot_ids = [1, 2, 3]
+        self.pubs = {}
+
         self.cv_bridge = cv_bridge.CvBridge()
 
         arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
         parameters = cv2.aruco.DetectorParameters()
         self.arucoDetector = cv2.aruco.ArucoDetector(arucoDict, parameters)
+
+        for i in self.bot_ids:
+            self.pubs[i] = self.create_publisher(Pose2D,
+                                                "/pen" + str(i) + "_pose",
+                                                10)
+
+
+        self.bot_path = {}
+        for i in self.bot_ids:
+            self.bot_path[i] = []
+
+    def undistort(self, img):
+
+        camera_matrix = np.array([431.68922,   0.     , 328.16933,
+           0.     , 431.88023, 222.03144,
+           0.     ,   0.     ,   1.     ]).reshape((3, 3))
+        
+        dist_coeffs = np.array([-0.354009, 0.106389, -0.000579, -0.001064, 0.000000]).reshape(-1)
+
+        width = 640
+        height = 480
+        undistorted_image = cv2.undistort(
+            img, camera_matrix, dist_coeffs, None#, newcameramatrix
+        )
+        pts1 = np.float32([[122,11],[519,9],[125,418],[522,414]])
+        # Size of the Transformed Image
+        pts2 = np.float32([[0,0],[500,0],[0,500],[500,500]])
+
+        # for val in pts1:
+            # cv2.circle(undistorted_image,(val[0],val[1]),5,(0,255,0),-1)
+        M = cv2.getPerspectiveTransform(pts1,pts2)
+        dst = cv2.warpPerspective(undistorted_image,M,(500,500))
+        return dst
+
     
     def image_callback(self,msg):
         
         img = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-
+        img = self.undistort(img)
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         # sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
         sharpen_kernel = np.array([                                         #this works better
                                     [0,-1,0], 
@@ -38,7 +90,7 @@ class camera_node(Node):
         ArucoDetailsDict = {}
         ArucoCorners = {}
         ArucoMarkerAngles = {}
-        corners, ids, rejected = self.arucoDetector.detectMarkers(img_sharp)
+        corners, ids, rejected = self.arucoDetector.detectMarkers(img) #change sharpen kernel
         '''
             id 1    bot
             id 4    bott left
@@ -46,19 +98,55 @@ class camera_node(Node):
             id 10   top right
             id 12   bott right
         '''
-        for i in range(0, ids.shape[0]):
-            DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
+        try:
+            for i in range(0, ids.shape[0]):
+                DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
 
-        ArucoMarkerAngles = self.getOrientationDeg(DetectedArucoMarkers)
+            ArucoMarkerAngles = self.getOrientationDeg(DetectedArucoMarkers)
 
-        for i in range(0, ids.shape[0]):
-            center = np.mean(corners[i][0], axis=0)
-            ArucoDetailsDict[int(ids[i][0,])] = [
-                center, ArucoMarkerAngles[int(ids[i][0,])]]
-            ArucoCorners[int(ids[i][0,])] = corners[i][0,]
+            for i in range(0, ids.shape[0]):
+                center = np.mean(corners[i][0], axis=0)
+                ArucoDetailsDict[int(ids[i][0,])] = [
+                    center, ArucoMarkerAngles[int(ids[i][0,])]]
+                ArucoCorners[int(ids[i][0,])] = corners[i][0,]
 
-        # img = cv2.aruco.drawDetectedMarkers(image = img, corners = corners, ids=ids, borderColor=(0, 255, 0))
-        img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
+            # img = cv2.aruco.drawDetectedMarkers(image = img, corners = corners, ids=ids, borderColor=(0, 255, 0))
+            img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
+        except:
+            pass
+
+        try:
+            arenaCenter = self.calibrateCenter(ArucoDetailsDict)
+
+            for i in self.bot_ids:
+                bot_loc = ArucoDetailsDict[i] #get bot id's details
+                # msg = "aru" + str(round(bot_loc[0][0], 2)) + "\t" + str(round(bot_loc[0][1], 2)) + "\t" + str(round(bot_loc[1], 2))
+                # ##disable#self.get_logger().info(msg)#################################################verify if bot coords is same as gazebo coords
+                # msg =  "cur" + str(round(self.hb_x, 2)) + "\t" + str(round(self.hb_y, 2)) + "\t" + str(round(self.hb_theta*180.0/math.pi, 2))
+                # ##disable#self.get_logger().info(msg)
+
+
+                #skipping theta calibration, by assuming it doesnt matter, calibrate if required
+                botCenterX = float(bot_loc[0][0] - arenaCenter[0]) + 250.0
+                botCenterY = float(bot_loc[0][1] - arenaCenter[1]) + 250.0
+                botTheta = float(bot_loc[1])  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
+
+                self.bot_path[i].append((int(bot_loc[0][0]), int(bot_loc[0][1])))
+
+                # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
+                
+                self.publishBotLocation(i, [botCenterX, botCenterY, botTheta]) # bot_id, [x, y, theta]
+
+        except KeyError as e:
+            #bot id not found or corner ids not found
+            #either publish panic message to stop bot or just pass, assume id will be detected in next loop
+            #better to stop bot as it will prevent it from rolling out of arena
+            # ##disable#self.get_logger().error(str(e.message))
+            ##disable#self.get_logger().error("Some Aruco Tags Were Not Detected")
+        # except Exception as e:
+        #     ##disable#self.get_logger().error(str(e))
+            pass    
+
         cv2.imshow('output video',img)
      
         cv2.waitKey(1)
@@ -124,13 +212,53 @@ class camera_node(Node):
             else:
                 angle = np.arccos(np.inner([1, 0], [midpoint_x, midpoint_y])/np.linalg.norm([midpoint_x, midpoint_y]))*180.0/np.pi
 
-            angle = round(angle-90.0, 2) # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller (probably) expects wrt y axis i.e. yaw
-            # self.get_logger().info(str(angle))
+            angle = round(angle-90.0, 2) % 360.0 # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller (probably) expects wrt y axis i.e. yaw
+            # ##disable#self.get_logger().info(str(angle))
             ArucoMarkerAngles[i] = angle
 
         # returning the angles of the ArUco markers in degrees as a dictionary
         return ArucoMarkerAngles
-    
+
+    def calibrateCenter(self, ArucoDetailsDict):
+        '''
+        Purpose:
+        ---
+        Calibrates center of arena by finding mid point of 3 aruco markers( tl, tr, br ) because "bl" isnt reliably detected
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        ArucoDetailsDict:List
+
+        Returns:
+        ---
+        List: [centerX, centerY] Calibrated values of arena's center
+
+        Example call:
+        ---
+        arenaCenter = self.calibrateCenter(ArucoDetailsDict)
+        '''
+        #returns board center
+        bl = ArucoDetailsDict[4][0]
+        tl = ArucoDetailsDict[8][0]
+        tr = ArucoDetailsDict[10][0]
+        br = ArucoDetailsDict[12][0]
+
+        corners = np.array([bl, tl, tr, br])
+        centerX = corners.mean(axis=0)[0] #- 250.0
+        centerY = corners.mean(axis=0)[1] #- 250.0
+
+        # centerX = tl[0] + (tr[0] - tl[0])/2.0
+        # centerY = tr[1] + (br[1] - tr[1])/2.0
+        # msg = "centerX " + str(centerX) + " centerY " + str(centerY)
+
+        # msg = f'{tl[0]} {tl[1]}  {tr[0]} {tr[1]}  {br[0]} {br[1]}'
+        # msg = f'{tl[0]} {tr[0]} {centerX}'
+
+        # ##disable#self.get_logger().info(msg)
+
+        return [centerX, centerY]
+
     def mark_ArUco_image(self, image, ArucoDetailsDict, ArucoCorners):
         '''
         Purpose:
@@ -164,7 +292,13 @@ class camera_node(Node):
             # cv2.circle(image, (int(corner[2][0]), int(corner[2][1])), thickn, (128, 0, 255), -1)
             # cv2.circle(image, (int(corner[3][0]), int(corner[3][1])), thickn, (25, 255, 255), -1)
             
-        
+            for i in self.bot_ids:
+                path = self.bot_path[i]
+                for index, item in enumerate(path): 
+                    if index == len(path) -1:
+                        break
+                    cv2.line(image, item, path[index + 1], [0, 255, 0], 2)
+
             tl_tr_center_x = int((corner[0][0] + corner[1][0]) / 2)
             tl_tr_center_y = int((corner[0][1] + corner[1][1]) / 2)
 
@@ -178,6 +312,36 @@ class camera_node(Node):
             cv2.putText(image, str(
                 angle), (center[0]-display_offset, center[1]+10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
         return image
+    
+    def publishBotLocation(self, bot_id, botLocation):
+        '''
+        Purpose:
+        ---
+        Publishes Bot's location and yaw
+
+        Input Arguments:
+        ---
+        self:ArUcoDetector
+        botLocation:List location of the bot in the format [x, y, theta]
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        self.publishBotLocation([botCenterX, botCenterY, botTheta])
+        '''
+        #botLocation is in the format [x, y, theta]
+        botTwist = Pose2D()
+        botTwist.x = botLocation[0] 
+        botTwist.y = botLocation[1] #idk why but '-' is required
+        botTwist.theta = math.radians(botLocation[2])
+
+        # msg = str(bot_id) +  "cal" + str(round(botLocation[0], 2)) + " " + str(round(botLocation[1], 2)) + " " + str(round(botLocation[2], 2))
+        # ##disable#self.get_logger().info(msg)
+
+        self.pubs[bot_id].publish(botTwist)
 
 
 def main(args=None):

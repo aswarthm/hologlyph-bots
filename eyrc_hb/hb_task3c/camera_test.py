@@ -3,7 +3,7 @@ import time
   
   
 # define a video capture object 
-vid = cv2.VideoCapture(2) # check the number it can change according to hardware
+vid = cv2.VideoCapture(0) # check the number it can change according to hardware
 time.sleep(1)
   
 while(True): 
