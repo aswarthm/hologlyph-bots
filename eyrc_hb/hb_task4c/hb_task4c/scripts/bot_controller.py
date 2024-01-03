@@ -41,6 +41,7 @@ from geometry_msgs.msg import Wrench
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose2D    
 import numpy as np  
+import signal
 
 
 from std_msgs.msg import Int32
@@ -53,6 +54,7 @@ class HBController(Node):
         self.bot_id = bot_id
         super().__init__(f'hb_controller{self.bot_id}')
         self.get_logger().info(f"{self.bot_id} id controller start")
+        # signal.signal(signal.SIGINT, self.sigint_handler)
 
         # self.create_timer(0.1, self.timerCb)
         
@@ -72,14 +74,23 @@ class HBController(Node):
         self.index = 0
         self.steps = 0
         self.totalSteps = 50
+        
 
         if(bot_id == 1):
             # self.create_timer(0.1, self.doSquare)
-            self.create_timer(0.1, self.doTriangle)
+            self.create_timer(0.1, self.doSquare)
         elif(bot_id == 2):
             self.create_timer(0.1, self.doTriangle)
         elif(bot_id == 3):
             self.create_timer(0.1, self.doCircle)
+
+    def sigint_handler(self, signal, frame):
+        force = np.array([0.0, 0.0, 0.0])
+        self.get_logger().info("signal" + str(signal))
+        self.get_logger().info("frame" + str(frame))
+        self.publish_force_vectors(force)
+        time.sleep(1000)
+        self.publish_force_vectors(force)
 
     def map(self, value, leftMin, leftMax, rightMin, rightMax):
         # Figure out how 'wide' each range is
@@ -133,17 +144,20 @@ class HBController(Node):
     
     def doSquare(self):
                     #rear, left, right
-        moveRight = [1.0, -0.5, -0.5] 
-        moveUp = [0.0, -math.sin(math.pi/3), math.sin(math.pi/3)]
-        moveLeft = [-1.0, 0.5, 0.5] 
-        moveDown = [0.0, math.sin(math.pi/3), -math.sin(math.pi/3)]
-        moveStop = [0.0, 0.0, 0.0]
+        motorConsts = np.array([0.9, 0.8, 0.75])
+        moveRight = np.array([1.0, -0.5, -0.5] ) * np.array([0.85, 0.8, 0.75])
+        moveUp = np.array([0.0, -math.sin(math.pi/3), math.sin(math.pi/3)]) * np.array([0.9, 0.8, 0.75])
+        moveLeft = np.array([-1.0, 0.5, 0.5] ) * np.array([0.97, 0.65, 0.65])
+        moveDown = np.array([0.0, math.sin(math.pi/3), -math.sin(math.pi/3)]) * np.array([0.9, 0.70, 0.9])
+        moveStop = np.array([0.0, 0.0, 0.0]) * np.array([0.9, 0.8, 0.75])
 
         moves = [moveRight, moveUp, moveLeft, moveDown, moveStop]
+        # moves = [moveDown]
 
         move = moves[self.index]
         self.steps += 1
         if(self.steps > self.totalSteps):
+            # move = np.multiply(move, motorConsts)
             self.publish_force_vectors(move)
             self.index += 1
             self.steps = 0
@@ -153,17 +167,18 @@ class HBController(Node):
     
     def doTriangle(self):
                     #rear, left, right
-        moveRight = [1.0, -0.5, -0.5] 
-        moveUp = [-0.5, -0.5, 1.0]
-        moveDown = [-0.5, 1.0, -0.5]
-        moveStop = [0.0, 0.0, 0.0]
+        moveRight = np.array([1.0, -0.5, -0.5]) * np.array([0.95, 0.75, 0.75])
+        moveUp = np.array([-0.5, -0.5, 1.0]) * np.array([0.9, 0.9, 1.0])
+        moveDown = np.array([-0.5, 1.0, -0.5]) * np.array([0.85, 0.8, 0.75])
+        moveStop = np.array([0.0, 0.0, 0.0]) * np.array([0.85, 0.8, 0.75])
 
         moves = [moveRight, moveUp, moveDown, moveStop]
+        # moves = [moveDown]
 
         move = moves[self.index]
+        self.publish_force_vectors(move)
         self.steps += 1
         if(self.steps > self.totalSteps):
-            self.publish_force_vectors(move)
             self.index += 1
             self.steps = 0
         
@@ -196,21 +211,21 @@ def main(args=None):
     executor = rclpy.executors.MultiThreadedExecutor()
 
     hb_controller_1 = HBController(bot_id=1)
-    # hb_controller_2 = HBController(bot_id=2)
-    # hb_controller_3 = HBController(bot_id=3)
+    hb_controller_2 = HBController(bot_id=2)
+    hb_controller_3 = HBController(bot_id=3)
 
 
     executor.add_node(hb_controller_1)
-    # executor.add_node(hb_controller_2)
-    # executor.add_node(hb_controller_3)
+    executor.add_node(hb_controller_2)
+    executor.add_node(hb_controller_3)
 
     try:
         executor.spin()
     finally:
         executor.shutdown()
         hb_controller_1.destroy_node()
-        # hb_controller_2.destroy_node()
-        # hb_controller_3.destroy_node()
+        hb_controller_2.destroy_node()
+        hb_controller_3.destroy_node()
         rclpy.shutdown()
        
     # # Main loop
