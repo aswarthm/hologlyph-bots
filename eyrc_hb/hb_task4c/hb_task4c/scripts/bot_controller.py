@@ -37,14 +37,12 @@ from tf_transformations import euler_from_quaternion
 from my_robot_interfaces.msg import Goal             
 
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import Wrench
+from geometry_msgs.msg import Vector3
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose2D    
 import numpy as np  
 import signal
 
-
-from std_msgs.msg import Int32
 
 
 # bot_id = 2
@@ -58,19 +56,10 @@ class HBController(Node):
 
         # self.create_timer(0.1, self.timerCb)
         
-        self.rear_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/rear_wheel_force",
+        self.cmd_vel_publisher = self.create_publisher(Vector3,
+                                                          f"/hb_bot_{self.bot_id}/cmd_vel",
                                                           10)
-        self.left_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/left_wheel_force",
-                                                          10)        
-        self.right_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/right_wheel_force",
-                                                          10)
-        self.cmd_vel_publisher = self.create_publisher(Twist,
-                                                       f"/cmd_vel/bot{self.bot_id}", 10)
         
-        self.test = self.create_publisher(Int32, '/Integer', 10)
         self.index = 0
         self.steps = 0
         self.totalSteps = 50
@@ -122,24 +111,13 @@ class HBController(Node):
         ---
         hb_controller.publish_force_vectors(force)
         '''
-        mult = 50.0
         self.get_logger().info("publish force" + str(self.bot_id) + str(force))
-        force_rear = Wrench()
-        force_left = Wrench()
-        force_right = Wrench()
+        cmd_vel = Vector3()
 
-        force_rear.force.y = self.map(force[0], -1.0, 1.0, 0.0, 180.0)
-        force_left.force.y = self.map(force[1], -1.0, 1.0, 0.0, 180.0)
-        force_right.force.y = self.map(force[2], -1.0, 1.0, 0.0, 180.0)
+        cmd_vel.x = self.map(force[0], -1.0, 1.0, 0.0, 180.0)
+        cmd_vel.y = self.map(force[1], -1.0, 1.0, 0.0, 180.0)
+        cmd_vel.z = self.map(force[2], -1.0, 1.0, 0.0, 180.0)
         
-        cmd_vel = Twist()
-        cmd_vel.linear.x = force[0]
-        msg = Int32()
-        msg.data = 45
-        self.test.publish(msg)
-        self.rear_wheel_publisher.publish(force_rear)
-        self.left_wheel_publisher.publish(force_left)
-        self.right_wheel_publisher.publish(force_right)
         self.cmd_vel_publisher.publish(cmd_vel)
     
     def doSquare(self):
