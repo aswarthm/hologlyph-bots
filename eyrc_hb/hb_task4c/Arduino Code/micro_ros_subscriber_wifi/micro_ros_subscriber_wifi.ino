@@ -6,24 +6,20 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
-#include <geometry_msgs/msg/wrench.h>
+#include <geometry_msgs/msg/vector3.h>
 #include <std_msgs/msg/int32.h>
 
 #include <ESP32Servo.h>
 
 
-rcl_subscription_t rear_wheel_subscriber;
-rcl_subscription_t left_wheel_subscriber;
-rcl_subscription_t right_wheel_subscriber;
+rcl_subscription_t velocity_subscriber;
 rclc_executor_t executor;
 rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
 
-geometry_msgs__msg__Wrench rear;
-geometry_msgs__msg__Wrench left;
-geometry_msgs__msg__Wrench right;
+geometry_msgs__msg__Vector3 velocity;
 
 #define LED_PIN 2
 #define BOT_ID 1
@@ -57,37 +53,20 @@ void error_loop() {
   }
 }
 
-void rear_wheel_callback(const void *msgin) {
-  const geometry_msgs__msg__Wrench *msg = (const geometry_msgs__msg__Wrench *)msgin;
-  double speed = msg->force.y;
+void velocity_callback(const void *msgin) {
+  const geometry_msgs__msg__Vector3 *msg = (const geometry_msgs__msg__Vector3 *)msgin;
+  double rear_vel = msg->x;
+  double left_vel = msg->y;
+  double right_vel = msg->z;
 
-  Serial.println("Rear Wheel Force" + String(speed));
+  Serial.println("Rear Wheel Velocity" + String(rear_vel));
+  Serial.println("Left Wheel Velocity" + String(left_vel));
+  Serial.println("Right Wheel Velocity" + String(right_vel));
+
+  rear_servo.write(int(rear_vel));
+  left_servo.write(int(left_vel));
+  right_servo.write(int(right_vel));
   
-  rear_servo.write(int(speed));
-}
-
-void left_wheel_callback(const void *msgin) {
-  const geometry_msgs__msg__Wrench *msg = (const geometry_msgs__msg__Wrench *)msgin;
-  double speed = msg->force.y;
-
-  Serial.println("Left Wheel Force" + String(speed));
-
-  left_servo.write(int(speed));
-}
-
-void right_wheel_callback(const void *msgin) {
-  const geometry_msgs__msg__Wrench *msg = (const geometry_msgs__msg__Wrench *)msgin;
-  double speed = msg->force.y;
-
-  Serial.println("Right Wheel Force" + String(speed));
-
-  right_servo.write(int(speed));
-}
-
-void apply_force(Servo servoo, int speed) {
-  // servoo.write(speed);
-  Serial.println("in apply force");
-  // rear_servo.write(180);
   // rear_servo.write(int(speed));
 }
 
@@ -102,7 +81,7 @@ void setup() {
   while (!Serial)
     ;
   Serial.println("Start");
-  set_microros_wifi_transports("test", "12345678", "192.168.91.27", 8888);
+  set_microros_wifi_transports("testt", "123456789", "192.168.227.27", 8888);
   Serial.println("wifi connected");
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
@@ -122,40 +101,22 @@ void setup() {
   RCCHECK(rclc_node_init_default(&node, node_name.c_str(), "", &support));
 
   //topic names
-  String rear_topic = "/hb_bot_" + String(BOT_ID) + "/rear_wheel_force";
-  String left_topic = "/hb_bot_" + String(BOT_ID) + "/left_wheel_force";
-  String right_topic = "/hb_bot_" + String(BOT_ID) + "/right_wheel_force";
+  String velocity_topic = "/hb_bot_" + String(BOT_ID) + "/cmd_vel";
 
-  Serial.println(rear_topic);
-  Serial.println(left_topic);
-  Serial.println(right_topic);
+  Serial.println(velocity_topic);
 
   //create subscribers
   RCCHECK(rclc_subscription_init_best_effort(
-    &rear_wheel_subscriber,
+    &velocity_subscriber,
     &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Wrench),
-    rear_topic.c_str()));
-
-  RCCHECK(rclc_subscription_init_best_effort(
-    &left_wheel_subscriber,
-    &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Wrench),
-    left_topic.c_str()));
-
-  RCCHECK(rclc_subscription_init_best_effort(
-    &right_wheel_subscriber,
-    &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Wrench),
-    right_topic.c_str()));
+    ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Vector3),
+    velocity_topic.c_str()));
 
   // create executor
   RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));
 
   //add subscriptions
-  RCCHECK(rclc_executor_add_subscription(&executor, &rear_wheel_subscriber, &rear, &rear_wheel_callback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &left_wheel_subscriber, &left, &left_wheel_callback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_subscription(&executor, &right_wheel_subscriber, &right, &right_wheel_callback, ON_NEW_DATA));
+  RCCHECK(rclc_executor_add_subscription(&executor, &velocity_subscriber, &velocity, &velocity_callback, ON_NEW_DATA));
 }
 
 void loop() {

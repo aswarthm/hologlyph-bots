@@ -37,13 +37,12 @@ from tf_transformations import euler_from_quaternion
 from my_robot_interfaces.msg import Goal             
 
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import Wrench
+from geometry_msgs.msg import Vector3
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose2D    
 import numpy as np  
+import signal
 
-
-from std_msgs.msg import Int32
 
 
 # bot_id = 2
@@ -53,33 +52,34 @@ class HBController(Node):
         self.bot_id = bot_id
         super().__init__(f'hb_controller{self.bot_id}')
         self.get_logger().info(f"{self.bot_id} id controller start")
+        # signal.signal(signal.SIGINT, self.sigint_handler)
 
         # self.create_timer(0.1, self.timerCb)
         
-        self.rear_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/rear_wheel_force",
+        self.cmd_vel_publisher = self.create_publisher(Vector3,
+                                                          f"/hb_bot_{self.bot_id}/cmd_vel",
                                                           10)
-        self.left_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/left_wheel_force",
-                                                          10)        
-        self.right_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/right_wheel_force",
-                                                          10)
-        self.cmd_vel_publisher = self.create_publisher(Twist,
-                                                       f"/cmd_vel/bot{self.bot_id}", 10)
         
-        self.test = self.create_publisher(Int32, '/Integer', 10)
         self.index = 0
         self.steps = 0
         self.totalSteps = 50
+        
 
         if(bot_id == 1):
             # self.create_timer(0.1, self.doSquare)
-            self.create_timer(0.1, self.doTriangle)
+            self.create_timer(0.1, self.doSquare)
         elif(bot_id == 2):
             self.create_timer(0.1, self.doTriangle)
         elif(bot_id == 3):
             self.create_timer(0.1, self.doCircle)
+
+    def sigint_handler(self, signal, frame):
+        force = np.array([0.0, 0.0, 0.0])
+        self.get_logger().info("signal" + str(signal))
+        self.get_logger().info("frame" + str(frame))
+        self.publish_force_vectors(force)
+        time.sleep(1000)
+        self.publish_force_vectors(force)
 
     def map(self, value, leftMin, leftMax, rightMin, rightMax):
         # Figure out how 'wide' each range is
@@ -111,39 +111,31 @@ class HBController(Node):
         ---
         hb_controller.publish_force_vectors(force)
         '''
-        mult = 50.0
         self.get_logger().info("publish force" + str(self.bot_id) + str(force))
-        force_rear = Wrench()
-        force_left = Wrench()
-        force_right = Wrench()
+        cmd_vel = Vector3()
 
-        force_rear.force.y = self.map(force[0], -1.0, 1.0, 0.0, 180.0)
-        force_left.force.y = self.map(force[1], -1.0, 1.0, 0.0, 180.0)
-        force_right.force.y = self.map(force[2], -1.0, 1.0, 0.0, 180.0)
+        cmd_vel.x = self.map(force[0], -1.0, 1.0, 0.0, 180.0)
+        cmd_vel.y = self.map(force[1], -1.0, 1.0, 0.0, 180.0)
+        cmd_vel.z = self.map(force[2], -1.0, 1.0, 0.0, 180.0)
         
-        cmd_vel = Twist()
-        cmd_vel.linear.x = force[0]
-        msg = Int32()
-        msg.data = 45
-        self.test.publish(msg)
-        self.rear_wheel_publisher.publish(force_rear)
-        self.left_wheel_publisher.publish(force_left)
-        self.right_wheel_publisher.publish(force_right)
         self.cmd_vel_publisher.publish(cmd_vel)
     
     def doSquare(self):
                     #rear, left, right
-        moveRight = [1.0, -0.5, -0.5] 
-        moveUp = [0.0, -math.sin(math.pi/3), math.sin(math.pi/3)]
-        moveLeft = [-1.0, 0.5, 0.5] 
-        moveDown = [0.0, math.sin(math.pi/3), -math.sin(math.pi/3)]
-        moveStop = [0.0, 0.0, 0.0]
+        motorConsts = np.array([0.9, 0.8, 0.75])
+        moveRight = np.array([1.0, -0.5, -0.5] ) * np.array([0.85, 0.8, 0.75])
+        moveUp = np.array([0.0, -math.sin(math.pi/3), math.sin(math.pi/3)]) * np.array([0.9, 0.8, 0.75])
+        moveLeft = np.array([-1.0, 0.5, 0.5] ) * np.array([0.97, 0.65, 0.65])
+        moveDown = np.array([0.0, math.sin(math.pi/3), -math.sin(math.pi/3)]) * np.array([0.9, 0.70, 0.9])
+        moveStop = np.array([0.0, 0.0, 0.0]) * np.array([0.9, 0.8, 0.75])
 
         moves = [moveRight, moveUp, moveLeft, moveDown, moveStop]
+        # moves = [moveDown]
 
         move = moves[self.index]
         self.steps += 1
         if(self.steps > self.totalSteps):
+            # move = np.multiply(move, motorConsts)
             self.publish_force_vectors(move)
             self.index += 1
             self.steps = 0
@@ -153,17 +145,18 @@ class HBController(Node):
     
     def doTriangle(self):
                     #rear, left, right
-        moveRight = [1.0, -0.5, -0.5] 
-        moveUp = [-0.5, -0.5, 1.0]
-        moveDown = [-0.5, 1.0, -0.5]
-        moveStop = [0.0, 0.0, 0.0]
+        moveRight = np.array([1.0, -0.5, -0.5]) * np.array([0.95, 0.75, 0.75])
+        moveUp = np.array([-0.5, -0.5, 1.0]) * np.array([0.9, 0.9, 1.0])
+        moveDown = np.array([-0.5, 1.0, -0.5]) * np.array([0.85, 0.8, 0.75])
+        moveStop = np.array([0.0, 0.0, 0.0]) * np.array([0.85, 0.8, 0.75])
 
         moves = [moveRight, moveUp, moveDown, moveStop]
+        # moves = [moveDown]
 
         move = moves[self.index]
+        self.publish_force_vectors(move)
         self.steps += 1
         if(self.steps > self.totalSteps):
-            self.publish_force_vectors(move)
             self.index += 1
             self.steps = 0
         
@@ -196,21 +189,21 @@ def main(args=None):
     executor = rclpy.executors.MultiThreadedExecutor()
 
     hb_controller_1 = HBController(bot_id=1)
-    # hb_controller_2 = HBController(bot_id=2)
-    # hb_controller_3 = HBController(bot_id=3)
+    hb_controller_2 = HBController(bot_id=2)
+    hb_controller_3 = HBController(bot_id=3)
 
 
     executor.add_node(hb_controller_1)
-    # executor.add_node(hb_controller_2)
-    # executor.add_node(hb_controller_3)
+    executor.add_node(hb_controller_2)
+    executor.add_node(hb_controller_3)
 
     try:
         executor.spin()
     finally:
         executor.shutdown()
         hb_controller_1.destroy_node()
-        # hb_controller_2.destroy_node()
-        # hb_controller_3.destroy_node()
+        hb_controller_2.destroy_node()
+        hb_controller_3.destroy_node()
         rclpy.shutdown()
        
     # # Main loop
