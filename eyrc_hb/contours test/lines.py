@@ -4,6 +4,19 @@ import numpy as np
 from skimage.morphology import skeletonize
 from skimage import io
 import matplotlib.pyplot as plt
+import json
+
+def Edge_Detection_Canny(cv_image):
+    cv_image =cv2.flip(cv_image ,1)
+    gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+    # customize the second and the third argument, minVal and maxVal
+    # in function cv2.Canny if needed
+    get_edge = cv2.Canny(blurred, 10, 100)
+    cv_image = np.hstack([get_edge])
+    cv2.imshow('Corners_Extracted', cv_image)
+    cv2.waitKey(0)
+    return cv_image
 
 
 
@@ -12,6 +25,9 @@ def showImg(img):
     cv2.waitKey(0)  
 
 image = cv2.imread('image_mode.png')
+
+# img = Edge_Detection_Canny(image)
+# showImg(img)
 
 # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # ret,thresh = cv2.threshold(gray,50,255,0)
@@ -59,6 +75,11 @@ for i, cnt in enumerate(contours):
     color = list(np.random.random(size=3) * 120 + 90)
     cv2.drawContours(image, contours, i, color, 3)
 showImg(image)
+
+with open("./contours.txt", "+w") as file:
+    for contour in contours:
+        file.write(str(contour.tolist()))
+        file.write("\n\n\n\n\n\n\n\n\n\n")
 
 # for cnt in contours:
 #    print(len(cnt))
