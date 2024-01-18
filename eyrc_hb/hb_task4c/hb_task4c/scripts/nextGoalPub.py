@@ -52,8 +52,8 @@ class ServiceNode(Node):
         msg_bot_2.theta = shape2_theta
 
         msg_bot_3.bot_id = 3
-        msg_bot_3.x = shape3_x
-        msg_bot_3.y = shape3_y
+        msg_bot_3.x = [10.0]#shape3_x
+        msg_bot_3.y = [10.0]#shape3_y
         msg_bot_3.theta = shape3_theta
 
         # msg_shape_info = Shape()

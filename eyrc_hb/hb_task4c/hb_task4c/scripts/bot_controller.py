@@ -59,19 +59,323 @@ class HBController(Node):
         self.cmd_vel_publisher = self.create_publisher(Vector3,
                                                           f"/hb_bot_{self.bot_id}/cmd_vel",
                                                           10)
-        
-        self.index = 0
-        self.steps = 0
-        self.totalSteps = 50
-        
+        self.create_timer(0.1, self.timerCb)
 
-        if(bot_id == 1):
-            # self.create_timer(0.1, self.doSquare)
-            self.create_timer(0.1, self.doSquare)
-        elif(bot_id == 2):
-            self.create_timer(0.1, self.doTriangle)
-        elif(bot_id == 3):
-            self.create_timer(0.1, self.doCircle)
+        self.goalsReceived = False        
+        self.index = 0
+        self.flag = 0
+        self.locationReceived = False
+        # Initialise the required variables
+        self.bot_x_goals = []
+        self.bot_y_goals = []
+        self.bot_theta_goal = 0.0
+
+        self.subscription_goal = self.create_subscription(Goal,  
+                                                     f'hb_bot_{self.bot_id}/goal',  
+                                                     self.goalCallBack,  # Callback function to handle received messages
+                                                     10  # QoS profile, here it's 10 which means a buffer size of 10 messages
+        )  
+        self.subscription_aruco = self.create_subscription(Pose2D, 
+                                                    "/pen" + str(bot_id) + "_pose",
+                                                    self.arucoCb,
+                                                    10)
+        
+        self.hb_x = 250.0
+        self.hb_y = 250.0
+        self.hb_theta = 0.0
+
+        self.k_mult = 40.0
+        self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
+        self.ka = 0.4*self.k_mult #2.8 #1.8
+
+        self.linear_tolerance = 4.5 # linear tolerance
+        self.angular_tolerance = math.radians(8) # degree tolerance
+
+        self.left_force = 0.0
+        self.right_force = 0.0
+        self.rear_force = 0.0
+
+        # For maintaining control loop rate.
+        self.rate = self.create_rate(100)
+
+    def arucoCb(self, msg):
+        '''
+        Purpose:
+        ---
+        Callback function when robot's position changes. Updates local variables with current x,y,theta
+
+        Input Arguments:
+        ---
+        self:HBController
+        odom:Pose2D updated odometry of robot
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
+        # ##disable#self.get_logger().info(str(msg))
+        if(self.locationReceived == False):
+            self.locationReceived = True
+
+        self.hb_x = msg.x
+        self.hb_y = msg.y
+        self.hb_theta = msg.theta
+
+    def inverse_kinematics(self, velocity):
+        '''
+        Purpose:
+        ---
+        Calculate inverse kinematics for the desired velocity
+
+        Input Arguments:
+        ---
+        self:HBController
+        velocity:numpy.ndarray in the format [theta, x, y]
+
+        Returns:
+        ---
+        force:numpy.ndarray in the format [rear_wheel, left_wheel, right_wheel]
+
+        Example call:
+        ---
+        force = hb_controller.inverse_kinematics(velocity)
+        '''
+        ############ ADD YOUR CODE HERE ############
+
+        # INSTRUCTIONS & HELP : 
+        #	-> Use the target velocity you calculated for the robot in previous task, and
+        #	Process it further to find what proportions of that effort should be given to 3 individuals wheels !!
+        #	Publish the calculated efforts to actuate robot by applying force vectors on provided topics
+        ############################################
+
+        ik_matrix = np.array([
+                                [1.0,1.0,0.0],
+                                [1.0,-math.cos(math.pi/3.0),-math.sin(math.pi/3.0)],
+                                [1.0,-math.cos(math.pi/3.0),math.sin(math.pi/3.0)]
+                            ])
+        # velocity is in the format [theta, x, y]
+        # force is in the format [rear_wheel, left_wheel, right_wheel]
+        force = np.dot(ik_matrix, velocity).flatten()
+
+        return force
+    
+    def goalCallBack(self, msg):
+        '''
+        Purpose:
+        ---
+        Callback function when bew goals are received. Updates array with goals to be reached
+        Sleeps for a certian amount of time to prevent collision
+
+        Input Arguments:
+        ---
+        self:HBController
+        msg:Goal goal list of bot containing x, y and theta
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
+        if(self.goalsReceived == False):
+            self.bot_x_goals = msg.x
+            self.bot_y_goals = msg.y
+            self.bot_theta_goal = msg.theta
+
+            self.goalsReceived = True
+            self.get_logger().info("Received Goal Points")
+
+            time.sleep(self.bot_id*3) #add some delay before starting to prevent collision
+
+            # for i in range(5*self.bot_id):
+            #     time.sleep(0.4)
+
+    def get_goal(self):
+        '''
+        Purpose:
+        ---
+        Returns the next goal for the bot and if all the goals have been reached i.e. end of list
+
+        Input Arguments:
+        ---
+        self:HBController
+
+        Returns:
+        ---
+        [goal_x, goal_y, goal_theta, end_of_list]
+
+        Example call:
+        ---
+        hb_controller.get_goal()
+        '''
+        goal_x = self.bot_x_goals[self.index]
+        goal_y = self.bot_y_goals[self.index]
+        goal_theta = self.bot_theta_goal
+
+        end_of_list = int((1 + self.index) >= len(self.bot_x_goals))
+
+        return [goal_x, goal_y, goal_theta, end_of_list]
+
+    def goal_reached(self, frame):
+        '''
+        Purpose:
+        ---
+        Checks if the bot is within acceptable limits, which tells if the bot has reached its goal
+
+        Input Arguments:
+        ---
+        self:HBController
+        frame:numpy.ndarray in the format [error_theta, error_x, error_y]
+
+        Returns:
+        ---
+        True if bot has reached goal
+        False otherwise
+
+        Example call:
+        ---
+        if(hb_controller.goal_reached(frame)):
+            # do something
+        '''
+        error_theta = frame[0]
+
+        error_linear = math.sqrt(math.pow(frame[1], 2) + math.pow(frame[2], 2))
+        ##disable#self.get_logger().info(str(error_linear))
+
+        if(abs(error_theta) < self.angular_tolerance and abs(error_linear) < self.linear_tolerance):
+        # if(abs(error_theta) < self.angular_tolerance and abs(frame[1]) < self.linear_tolerance and abs(frame[2]) < self.linear_tolerance):
+            return True
+        
+        return False
+    
+    def stop_bot(self):
+        '''
+        Purpose:
+        ---
+        Stops the bot after reaching goal, or in case of an emergency
+
+        Input Arguments:
+        ---
+        self:HBController
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        hb_controller.stop_bot()
+        '''
+        self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
+
+    def normalize_velocity(self, velocity):
+        '''
+        Purpose:
+        ---
+        Makes sure the velocities are within acceptable range to prevent unpredictable behaviour
+
+        Input Arguments:
+        ---
+        self:HBController
+        velocity: List
+
+        Returns:
+        ---
+        velocity: List
+
+        Example call:
+        ---
+        hb_controller.normalize_velocity(velocity)
+        '''
+        max_vel = 60.0
+
+        velocity[1] = max(-max_vel, min(velocity[1], max_vel))
+        velocity[2] = max(-max_vel, min(velocity[2], max_vel))
+        return velocity
+    
+    def timerCb(self):
+        '''
+        Purpose:
+        ---
+        Callback function to run main loop of the controller
+        simplifies multi threading
+
+        Input Arguments:
+        ---
+        self:HBController
+
+        Returns:
+        ---
+        None
+
+        Example call:
+        ---
+        -
+        '''
+        # Check if the goals have been received
+        if self.goalsReceived == True and self.locationReceived == True:
+            try:
+                # response from the service call
+                response = self.get_goal()
+            except Exception as e:
+                ##disable###disable#self.get_logger().info('Goal call failed %r' % (e,))
+                pass
+            else:
+                #########           GOAL POSE             #########
+                x_goal      = response[0] #+ 250.0
+                y_goal      = response[1] #+ 250.0
+                theta_goal  = response[2]
+                self.flag = response[3]
+                ####################################################
+
+                ##disable###disable#self.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
+                ##disable###disable#self.get_logger().info(f'cur {self.hb_x} {self.hb_y} {math.degrees(self.hb_theta)}')
+                
+                # Calculate Error from feedback
+                error_x = x_goal - self.hb_x
+                error_y = y_goal - self.hb_y
+                error_theta = theta_goal - self.hb_theta
+
+                # Change the frame by using Rotation Matrix (If you find it required)
+                frame = np.array([error_theta, error_x, error_y])
+
+                rot_matrix = np.array([
+                                        [1, 0, 0],
+                                        [0, math.cos(self.hb_theta), -math.sin(self.hb_theta)],
+                                        [0, -math.sin(self.hb_theta), -math.cos(self.hb_theta)],
+                                      ])
+                global_error = np.dot(frame, rot_matrix).flatten()
+                # ##disable###disable#self.get_logger().info(str(global_error))
+            
+                # Calculate the required velocity of bot for the next iteration(s)
+                k = np.array([self.ka, self.kp, self.kp])
+                velocity = np.multiply(global_error, k)
+                velocity = self.normalize_velocity(velocity)
+                ##disable###disable#self.get_logger().info(str(velocity))
+                
+                # Find the required force vectors for individual wheels from it.(Inverse Kinematics)
+                force = self.inverse_kinematics(velocity)
+
+                # Apply appropriate force vectors
+                self.publish_force_vectors(force)
+
+                # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
+                if(self.goal_reached(frame)):
+                    # self.stop_bot()
+
+                    ############     DO NOT MODIFY THIS       #########
+                    self.index += 1
+                    if self.flag == 1 :
+                        self.index = 0
+                    ####################################################
+
+
 
     def sigint_handler(self, signal, frame):
         force = np.array([0.0, 0.0, 0.0])
@@ -114,9 +418,9 @@ class HBController(Node):
         self.get_logger().info("publish force" + str(self.bot_id) + str(force))
         cmd_vel = Vector3()
 
-        cmd_vel.x = self.map(force[0], -1.0, 1.0, 0.0, 180.0)
-        cmd_vel.y = self.map(force[1], -1.0, 1.0, 0.0, 180.0)
-        cmd_vel.z = self.map(force[2], -1.0, 1.0, 0.0, 180.0)
+        cmd_vel.x = self.map(force[0], -100.0, 100.0, 0.0, 180.0)
+        cmd_vel.y = self.map(force[1], -100.0, 100.0, 0.0, 180.0)
+        cmd_vel.z = self.map(force[2], -100.0, 100.0, 0.0, 180.0)
         
         self.cmd_vel_publisher.publish(cmd_vel)
     

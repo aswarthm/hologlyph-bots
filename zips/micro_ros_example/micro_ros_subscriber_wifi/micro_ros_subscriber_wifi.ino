@@ -51,7 +51,7 @@ void setup() {
   while (!Serial)
     ;
   Serial.println("Start");
-  set_microros_wifi_transports("test", "12345678", "192.168.91.27", 8888);
+  set_microros_wifi_transports("Ethereum", "ashnabhi", "192.168.1.30", 8888);
   Serial.println("wifi connected");
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);

@@ -22,7 +22,7 @@ rcl_timer_t timer;
 geometry_msgs__msg__Vector3 velocity;
 
 #define LED_PIN 2
-#define BOT_ID 1
+#define BOT_ID 3
 
 #define rear_servo_pin 25
 #define left_servo_pin 26
@@ -81,7 +81,7 @@ void setup() {
   while (!Serial)
     ;
   Serial.println("Start");
-  set_microros_wifi_transports("testt", "123456789", "192.168.227.27", 8888);
+  set_microros_wifi_transports("Ethereum", "ashnabhi", "192.168.1.31", 8888);
   Serial.println("wifi connected");
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);

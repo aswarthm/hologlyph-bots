@@ -65,8 +65,8 @@ def generate_launch_description():
     return LaunchDescription([
         # world,
         # spawn_bot,
-        # goalPub,
-        # feedback,
+        goalPub,
+        feedback,
         controller,
         # test,
         ])
