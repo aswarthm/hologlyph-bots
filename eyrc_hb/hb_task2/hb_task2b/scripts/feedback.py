@@ -177,7 +177,6 @@ class ArUcoDetector(Node):
             ArucoCorners[int(ids[i][0,])] = corners[i][0,]
 
         # img = cv2.aruco.drawDetectedMarkers(image = img, corners = corners, ids=ids, borderColor=(0, 255, 0))
-        img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
 
         # ##disable#self.get_logger().info(str(rejected))
         # img = self.mark_ArUco_image(img, self.DetectedArucoMarkers, self.DetectedArucoMarkers)
@@ -189,11 +188,17 @@ class ArUcoDetector(Node):
             arenaCenter = self.calibrateCenter(ArucoDetailsDict)
 
             for i in self.bot_ids:
+
+                ArucoDetailsDict[i][0][0] += 10.0 #pen offset
+                ArucoDetailsDict[i][0][1] += 10.0 #pen offset
+                
+
                 bot_loc = ArucoDetailsDict[i] #get bot id's details
                 # msg = "aru" + str(round(bot_loc[0][0], 2)) + "\t" + str(round(bot_loc[0][1], 2)) + "\t" + str(round(bot_loc[1], 2))
                 # ##disable#self.get_logger().info(msg)#################################################verify if bot coords is same as gazebo coords
                 # msg =  "cur" + str(round(self.hb_x, 2)) + "\t" + str(round(self.hb_y, 2)) + "\t" + str(round(self.hb_theta*180.0/math.pi, 2))
                 # ##disable#self.get_logger().info(msg)
+
 
 
                 #skipping theta calibration, by assuming it doesnt matter, calibrate if required
@@ -217,6 +222,7 @@ class ArUcoDetector(Node):
         #     ##disable#self.get_logger().error(str(e))
             pass
 
+        img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
         cv2.imshow("lol", img)
         cv2.waitKey(1)
 
@@ -280,9 +286,13 @@ class ArUcoDetector(Node):
                 angle = 360.0-np.arccos(np.inner([1, 0], [midpoint_x, midpoint_y])/np.linalg.norm([midpoint_x, midpoint_y]))*180.0/np.pi
             else:
                 angle = np.arccos(np.inner([1, 0], [midpoint_x, midpoint_y])/np.linalg.norm([midpoint_x, midpoint_y]))*180.0/np.pi
-
+            
             angle = round(angle-90.0, 2) % 360.0 # -90 to convert angle to be from y axis. aruco code gives angle wrt x axis, but controller (probably) expects wrt y axis i.e. yaw
-            # ##disable#self.get_logger().info(str(angle))
+            
+            if(angle > 180.0):
+                angle = angle - 360 # 355 -> -5
+            angle = -round(angle, 2)
+
             ArucoMarkerAngles[i] = angle
 
         # returning the angles of the ArUco markers in degrees as a dictionary

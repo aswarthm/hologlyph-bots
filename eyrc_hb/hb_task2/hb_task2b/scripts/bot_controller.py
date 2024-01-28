@@ -56,6 +56,14 @@ bot_done = { # if all are 1 then end run
     3: 0
 }
 
+bot_is_home = {
+    1: 0,
+    2: 0,
+    3: 0
+}
+
+bot_home_flag = 0
+
 class HBController(Node):
     def __init__(self, bot_id):
         self.bot_id = bot_id
@@ -113,8 +121,6 @@ class HBController(Node):
         self.pen_down_publisher = self.create_publisher(Bool, 
                                                         f"/pen{self.bot_id}_down",
                                                         10)
-        
-        self.client = self.create_client(Empty, 'Stop_Flag')
 
 
         self.hb_x = 250.0
@@ -233,7 +239,7 @@ class HBController(Node):
 
             self.goalsReceived = True
 
-            time.sleep(self.bot_id*3) #add some delay before starting to prevent collision
+            # time.sleep(self.bot_id*3) #add some delay before starting to prevent collision
 
             # for i in range(5*self.bot_id):
             #     time.sleep(0.4)
@@ -372,13 +378,19 @@ class HBController(Node):
         velocity[2] = max(-max_vel, min(velocity[2], max_vel))
         
         return velocity
-    
-    def finished_run(self):
+
+
+    def allBotsHome(self):
+        global bot_home_flag
 
         for i in bot_ids:
-            if(bot_done[i] == 0):
+            if(bot_is_home[i] == 0):
                 return False
         
+        if(bot_home_flag == 0):
+            bot_home_flag = 1
+            time.sleep((3-self.bot_id)*3)
+
         return True
 
     
@@ -426,7 +438,7 @@ class HBController(Node):
                 error_theta = theta_goal - self.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
-                frame = np.array([error_theta, error_x, error_y])
+                frame = np.array([-error_theta, error_x, error_y])
 
                 rot_matrix = np.array([
                                         [1, 0, 0],
@@ -452,22 +464,31 @@ class HBController(Node):
                 if(self.goal_reached(frame)):
                     # self.stop_bot()
 
+                    if(self.index == 0):
+                        bot_is_home[self.bot_id] = 1
+                        self.stop_bot()
+                        while(self.allBotsHome() == False):
+                            pass
+
                     if(self.index == 1):
                         msg = Bool()
                         msg.data = True #do pendown
                         self.pen_down_publisher.publish(msg)
+
                     
                     if(self.index == len(self.bot_x_goals)-1):
                         msg = Bool()
                         msg.data = False #do penup
                         bot_done[self.bot_id] = 1
                         self.pen_down_publisher.publish(msg)
+
+                        self.goalsReceived = False
                         self.stop_bot()
-                    
-                    if(self.finished_run()):
-                        request = Empty.Request()
-                        self.client.call_async(request)
-                    
+                        self.destroy_node()
+                                                                
+                    # if(self.finished_run()):
+                    #     request = Empty.Request()
+                    #     self.client.call_async(request)
 
                     ############     DO NOT MODIFY THIS       #########
                     self.index += 1
@@ -475,6 +496,28 @@ class HBController(Node):
                         self.index = 0
                     ####################################################
 
+
+class StopService(Node):
+    def __init__(self):
+        super().__init__(f'stop_service_node_start')
+        self.client = self.create_client(Empty, 'Stop_Flag')
+        self.create_timer(0.1, self.timerCb)
+    
+    def finished_run(self):
+
+        for i in bot_ids:
+            if(bot_done[i] == 0):
+                return False
+            
+        return True
+    
+    def timerCb(self):
+        if(self.finished_run()):
+            request = Empty.Request()
+            self.client.call_async(request)
+            self.get_logger().info("Finished Run")
+
+            self.destroy_node()
 
 
 def main(args=None):
@@ -491,13 +534,21 @@ def main(args=None):
     executor.add_node(hb_controller_2)
     executor.add_node(hb_controller_3)
 
+
+    stop_serv = StopService()
+
+    executor.add_node(stop_serv)
+
     try:
         executor.spin()
+
     finally:
         executor.shutdown()
         hb_controller_1.destroy_node()
         hb_controller_2.destroy_node()
         hb_controller_3.destroy_node()
+
+        stop_serv.destroy_node()
         rclpy.shutdown()
        
     # # Main loop

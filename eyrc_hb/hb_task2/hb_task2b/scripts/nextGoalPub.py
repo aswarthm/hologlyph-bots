@@ -29,9 +29,9 @@ class ServiceNode(Node):
         sq_side_length  = np.random.randint(50, 90)
         dec_side_length = np.random.randint(50, 80)
 
-        tri_theta = np.pi/4 #np.random.uniform(0, 2*np.pi)
-        sq_theta  = np.pi/4 #np.random.uniform(0, 2*np.pi)
-        dec_theta = np.pi/4 #np.random.uniform(0, 2*np.pi)
+        tri_theta = 0.0 #np.random.uniform(0, 2*np.pi)
+        sq_theta  = 0.0 #np.random.uniform(0, 2*np.pi)
+        dec_theta = 0.0 #np.random.uniform(0, 2*np.pi)
 
         shape1_x, shape1_y, shape1_theta  = generate_triangle(tri_side_length, 300, 200, tri_theta, 100)
         shape2_x, shape2_y, shape2_theta  = generate_square(sq_side_length, 150, 250, sq_theta, 100)
