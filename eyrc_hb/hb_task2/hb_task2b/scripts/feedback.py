@@ -44,6 +44,7 @@ import numpy as np
 from nav_msgs.msg import Odometry
 from math import sin, cos
 from tf_transformations import euler_from_quaternion
+from std_msgs.msg import Bool
 
 # Import the required modules
 ##############################################################
@@ -75,7 +76,11 @@ class ArUcoDetector(Node):
         self.bot_ids = [1, 2, 3]
 
         self.pubs = {}
+        self.penDownSubscriptions = {}
         self.cv_bridge = CvBridge()
+
+        self.penDownCallbacks = [self.penDown_1, self.penDown_1, self.penDown_2, self.penDown_3]
+        self.isPenDown = [False, False, False, False]
 
         arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
         parameters = cv2.aruco.DetectorParameters()
@@ -86,15 +91,35 @@ class ArUcoDetector(Node):
                                                      "/camera/image_raw",
                                                      self.image_callback,
                                                      10)
+                                                    
+
         
         for i in self.bot_ids:
             self.pubs[i] = self.create_publisher(Pose2D,
-                                                "/detected_aruco_" + str(i),
+                                                f"pen{i}_pose",
                                                 10)
+
+            self.penDownSubscriptions[i] = self.create_subscription(Bool,
+                                                        f"pen{i}_down",
+                                                        self.penDownCallbacks[i],
+                                                        10)
 
         self.bot_path = {}
         for i in self.bot_ids:
             self.bot_path[i] = []
+
+
+    def penDown_1(self, msg):
+        self.isPenDown[1] = msg.data
+        self.get_logger().info("Bot 1 pen Down: " + str(msg.data))
+
+    def penDown_2(self, msg):
+        self.isPenDown[2] = msg.data
+        self.get_logger().info("Bot 2 pen Down: " + str(msg.data))
+
+    def penDown_3(self, msg):
+        self.isPenDown[3] = msg.data
+        self.get_logger().info("Bot 3 pen Down: " + str(msg.data))
 
     def image_callback(self, msg):
         '''
@@ -176,7 +201,7 @@ class ArUcoDetector(Node):
                 botCenterY = float(bot_loc[0][1] - arenaCenter[1]) + 250.0
                 botTheta = float(bot_loc[1])  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
 
-                self.bot_path[i].append((int(bot_loc[0][0]), int(bot_loc[0][1])))
+                self.bot_path[i].append( (int(bot_loc[0][0]), int(bot_loc[0][1]), int(self.isPenDown[i])) )
 
                 # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
                 
@@ -332,16 +357,6 @@ class ArUcoDetector(Node):
 
             corner = ArucoCorners[int(ids)]
             cv2.circle(image, (int(corner[0][0]), int(corner[0][1])), thickn, (50, 50, 255), -1)
-            # cv2.circle(image, (int(corner[1][0]), int(corner[1][1])), thickn, (0, 255, 0), -1)
-            # cv2.circle(image, (int(corner[2][0]), int(corner[2][1])), thickn, (128, 0, 255), -1)
-            # cv2.circle(image, (int(corner[3][0]), int(corner[3][1])), thickn, (25, 255, 255), -1)
-            
-            for i in self.bot_ids:
-                path = self.bot_path[i]
-                for index, item in enumerate(path): 
-                    if index == len(path) -1:
-                        break
-                    cv2.line(image, item, path[index + 1], [0, 255, 0], 2)
 
             tl_tr_center_x = int((corner[0][0] + corner[1][0]) / 2)
             tl_tr_center_y = int((corner[0][1] + corner[1][1]) / 2)
@@ -355,6 +370,18 @@ class ArUcoDetector(Node):
             angle = details[1]
             cv2.putText(image, str(
                 angle), (center[0]-display_offset, center[1]+10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
+
+        for i in self.bot_ids:
+            path = self.bot_path[i]
+            for index, item in enumerate(path): 
+                if index == len(path) -1:
+                    break
+                point = (item[0], item[1])
+                if(item[2]):
+                    cv2.line(image, item[:2], path[index + 1][:2], [0, 255, 0], 2)
+                else:
+                    cv2.line(image, item[:2], path[index + 1][:2], [0, 0, 0], 2)
+                    
         return image
 
     def publishBotLocation(self, bot_id, botLocation):

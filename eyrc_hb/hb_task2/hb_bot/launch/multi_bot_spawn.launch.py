@@ -8,7 +8,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     actions = []
-    pos_x = [-4.0, 0.0,  4.5]
+    pos_x = [ 4.5, 0.0,  -4.0]
     pos_y = [-9.0, -9.0, -9.0]
     share_dir = get_package_share_directory('hb_bot')
 

@@ -78,17 +78,18 @@ void init_servos() {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial)
-    ;
+  delay(2000);
+  // while (!Serial)
+  //   ;
   Serial.println("Start");
-  set_microros_wifi_transports("Ethereum", "ashnabhi", "192.168.1.31", 8888);
+  set_microros_wifi_transports("test", "12345678", "192.168.1.100", 8888);
   Serial.println("wifi connected");
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
 
   init_servos();
 
-  delay(2000);
+  // delay(2000);
 
   allocator = rcl_get_default_allocator();
 

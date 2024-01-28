@@ -41,10 +41,20 @@ from geometry_msgs.msg import Wrench
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose2D    
 import numpy as np  
+from std_msgs.msg import Bool
+from std_srvs.srv import Empty
 
 
 
 # bot_id = 2
+
+bot_ids = [1, 2, 3]
+
+bot_done = { # if all are 1 then end run
+    1: 0,
+    2: 0,
+    3: 0
+}
 
 class HBController(Node):
     def __init__(self, bot_id):
@@ -66,6 +76,13 @@ class HBController(Node):
         self.bot_y_goals = []
         self.bot_theta_goal = 0.0
 
+        self.bot_home = {
+            1: [397.0, 455.0],
+            2: [243.0, 448.0],
+            3: [93.0, 440.0]
+        }
+
+
         # Initialze Publisher and Subscriber
         # NOTE: You are strictly NOT-ALLOWED to use "cmd_vel" or "odom" topics in this task
 	    #	Use the below given topics to generate motion for the robot.
@@ -80,7 +97,7 @@ class HBController(Node):
                                                      10  # QoS profile, here it's 10 which means a buffer size of 10 messages
         )  
         self.subscription_aruco = self.create_subscription(Pose2D, 
-                                                    f'/detected_aruco_{self.bot_id}',
+                                                    f'/pen{self.bot_id}_pose',
                                                     self.arucoCb,
                                                     10)
         
@@ -93,6 +110,11 @@ class HBController(Node):
         self.right_wheel_publisher = self.create_publisher(Wrench,
                                                           f"/hb_bot_{self.bot_id}/right_wheel_force",
                                                           10)
+        self.pen_down_publisher = self.create_publisher(Bool, 
+                                                        f"/pen{self.bot_id}_down",
+                                                        10)
+        
+        self.client = self.create_client(Empty, 'Stop_Flag')
 
 
         self.hb_x = 250.0
@@ -199,8 +221,14 @@ class HBController(Node):
         -
         '''
         if(self.goalsReceived == False):
+            x = self.bot_home[self.bot_id][0]
+            y = self.bot_home[self.bot_id][1]
+
             self.bot_x_goals = msg.x
             self.bot_y_goals = msg.y
+
+            # self.bot_x_goals = [x].append(msg.x)
+            # self.bot_y_goals = [y].append(msg.y)
             self.bot_theta_goal = msg.theta
 
             self.goalsReceived = True
@@ -342,7 +370,17 @@ class HBController(Node):
 
         velocity[1] = max(-max_vel, min(velocity[1], max_vel))
         velocity[2] = max(-max_vel, min(velocity[2], max_vel))
+        
         return velocity
+    
+    def finished_run(self):
+
+        for i in bot_ids:
+            if(bot_done[i] == 0):
+                return False
+        
+        return True
+
     
     def timerCb(self):
         '''
@@ -413,6 +451,23 @@ class HBController(Node):
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
                 if(self.goal_reached(frame)):
                     # self.stop_bot()
+
+                    if(self.index == 1):
+                        msg = Bool()
+                        msg.data = True #do pendown
+                        self.pen_down_publisher.publish(msg)
+                    
+                    if(self.index == len(self.bot_x_goals)-1):
+                        msg = Bool()
+                        msg.data = False #do penup
+                        bot_done[self.bot_id] = 1
+                        self.pen_down_publisher.publish(msg)
+                        self.stop_bot()
+                    
+                    if(self.finished_run()):
+                        request = Empty.Request()
+                        self.client.call_async(request)
+                    
 
                     ############     DO NOT MODIFY THIS       #########
                     self.index += 1
