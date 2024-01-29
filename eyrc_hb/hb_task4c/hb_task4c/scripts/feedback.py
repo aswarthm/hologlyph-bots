@@ -303,8 +303,7 @@ class camera_node(Node):
             cv2.circle(image, center, thickn, (0, 0, 255), -1)
 
             corner = ArucoCorners[int(ids)]
-            cv2.circle(image, (int(corner[0][0]), int(
-                corner[0][1])), thickn, (50, 50, 255), -1)
+            cv2.circle(image, (int(corner[0][0]), int(corner[0][1])), thickn, (50, 50, 255), -1)
             # cv2.circle(image, (int(corner[1][0]), int(corner[1][1])), thickn, (0, 255, 0), -1)
             # cv2.circle(image, (int(corner[2][0]), int(corner[2][1])), thickn, (128, 0, 255), -1)
             # cv2.circle(image, (int(corner[3][0]), int(corner[3][1])), thickn, (25, 255, 255), -1)

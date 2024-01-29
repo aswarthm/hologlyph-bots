@@ -88,7 +88,7 @@ class ArUcoDetector(Node):
 
         # Subscribe the topic /camera/image_raw
         self.subscription = self.create_subscription(sensor_msgs.msg.Image,
-                                                     "/camera/image_raw",
+                                                     "/camera1/image_raw",
                                                      self.image_callback,
                                                      10)
                                                     
@@ -120,6 +120,34 @@ class ArUcoDetector(Node):
     def penDown_3(self, msg):
         self.isPenDown[3] = msg.data
         self.get_logger().info("Bot 3 pen Down: " + str(msg.data))
+    
+    def undistort(self, img):
+
+        camera_matrix = np.array([431.68922,   0., 328.16933,
+                                  0., 431.88023, 222.03144,
+                                  0.,   0.,   1.]).reshape((3, 3))
+
+        dist_coeffs = np.array(
+            [-0.354009, 0.106389, -0.000579, -0.001064, 0.000000]).reshape(-1)
+
+        width = 640
+        height = 480
+        undistorted_image = cv2.undistort(
+            img, camera_matrix, dist_coeffs, None  # , newcameramatrix
+        )
+        return undistorted_image
+
+    
+    def perspective_transform(self, img):
+        pts1 = np.float32([[122, 11], [519, 9], [125, 418], [522, 414]])
+        # Size of the Transformed Image
+        pts2 = np.float32([[0, 0], [500, 0], [0, 500], [500, 500]])
+
+        # for val in pts1:
+        # cv2.circle(undistorted_image,(val[0],val[1]),5,(0,255,0),-1)
+        M = cv2.getPerspectiveTransform(pts1, pts2)
+        dst = cv2.warpPerspective(img, M, (500, 500))
+        return dst
 
     def image_callback(self, msg):
         '''
@@ -143,13 +171,18 @@ class ArUcoDetector(Node):
         # convert ROS image to opencv image
         img = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
+        img_2 = self.undistort(img)
+        img_2 = self.perspective_transform(img_2)
+        img_2 = cv2.rotate(img_2, cv2.ROTATE_90_COUNTERCLOCKWISE)
         # sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
-        sharpen_kernel = np.array([                                         #this works better
-                                    [0,-1,0], 
-                                    [-1,6,-1], 
-                                    [0,-1,0]
-                                  ])
+        sharpen_kernel = np.array([  # this works better
+            [0, -1, 0],
+            [-1, 6, -1],
+            [0, -1, 0]
+        ])
         img_sharp = cv2.filter2D(img, -1, sharpen_kernel)
+        img_sharp = img_2
+        img = img_2
         # img = img_sharp
 
         # Detect Aruco marker
@@ -158,6 +191,7 @@ class ArUcoDetector(Node):
         ArucoCorners = {}
         ArucoMarkerAngles = {}
         corners, ids, rejected = self.arucoDetector.detectMarkers(img_sharp)
+        # corners, ids, rejected = self.arucoDetector.detectMarkers(img_2)
         '''
             id 1    bot
             id 4    bott left
@@ -186,8 +220,12 @@ class ArUcoDetector(Node):
         # Publish the bot coordinates to the topic  /detected_aruco
         try:
             arenaCenter = self.calibrateCenter(ArucoDetailsDict)
+        except:
+            pass
+            # self.get_logger().info("Corner Aruco Markers Not Detected")
 
-            for i in self.bot_ids:
+        for i in self.bot_ids:
+            try:
 
                 ArucoDetailsDict[i][0][0] += 10.0 #pen offset
                 ArucoDetailsDict[i][0][1] += 10.0 #pen offset
@@ -211,16 +249,19 @@ class ArUcoDetector(Node):
                 # msg =  "cal" + str(round(botCenterX, 2)) + " " + str(round(botCenterY, 2)) + " " + str(round(bot_loc[1], 2))
                 
                 self.publishBotLocation(i, [botCenterX, botCenterY, botTheta]) # bot_id, [x, y, theta]
+            except:
+                pass
+                # self.get_logger().info("Bot Aruco Marker Not Detected")
 
-        except KeyError as e:
-            #bot id not found or corner ids not found
-            #either publish panic message to stop bot or just pass, assume id will be detected in next loop
-            #better to stop bot as it will prevent it from rolling out of arena
-            # ##disable#self.get_logger().error(str(e.message))
-            ##disable#self.get_logger().error("Some Aruco Tags Were Not Detected")
-        # except Exception as e:
-        #     ##disable#self.get_logger().error(str(e))
-            pass
+        # except KeyError as e:
+        #     #bot id not found or corner ids not found
+        #     #either publish panic message to stop bot or just pass, assume id will be detected in next loop
+        #     #better to stop bot as it will prevent it from rolling out of arena
+        #     # ##disable#self.get_logger().error(str(e.message))
+        #     ##disable#self.get_logger().error("Some Aruco Tags Were Not Detected")
+        # # except Exception as e:
+        # #     ##disable#self.get_logger().error(str(e))
+        #     pass
 
         img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
         cv2.imshow("lol", img)
@@ -380,17 +421,21 @@ class ArUcoDetector(Node):
             angle = details[1]
             cv2.putText(image, str(
                 angle), (center[0]-display_offset, center[1]+10), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
-
+            
+        bot_cols = {
+            1: [0, 0, 255],
+            2: [255, 0, 0],
+            3: [0, 255, 0],
+        }
         for i in self.bot_ids:
             path = self.bot_path[i]
-            for index, item in enumerate(path): 
-                if index == len(path) -1:
+            for index, item in enumerate(path):
+                if index == len(path) - 1:
                     break
-                point = (item[0], item[1])
                 if(item[2]):
-                    cv2.line(image, item[:2], path[index + 1][:2], [0, 255, 0], 2)
+                    cv2.line(image, item[:2], path[index + 1][:2], bot_cols[i], 2)
                 else:
-                    cv2.line(image, item[:2], path[index + 1][:2], [0, 0, 0], 2)
+                    cv2.line(image, item[:2], path[index + 1][:2], [50, 50, 50], 1)
                     
         return image
 
@@ -420,7 +465,7 @@ class ArUcoDetector(Node):
         botTwist.theta = math.radians(botLocation[2])
 
         # msg = str(bot_id) +  "cal" + str(round(botLocation[0], 2)) + " " + str(round(botLocation[1], 2)) + " " + str(round(botLocation[2], 2))
-        # ##disable#self.get_logger().info(msg)
+        # self.get_logger().info(msg)
 
         self.pubs[bot_id].publish(botTwist)
 

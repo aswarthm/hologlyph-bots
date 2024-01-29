@@ -44,6 +44,8 @@ import numpy as np
 from std_msgs.msg import Bool
 from std_srvs.srv import Empty
 
+from geometry_msgs.msg import Vector3
+
 
 
 # bot_id = 2
@@ -57,12 +59,12 @@ bot_done = { # if all are 1 then end run
 }
 
 bot_is_home = {
-    1: 0,
-    2: 0,
+    1: 1,
+    2: 1,
     3: 0
 }
 
-bot_home_flag = 0
+bot_home_flag = 1
 
 class HBController(Node):
     def __init__(self, bot_id):
@@ -105,7 +107,7 @@ class HBController(Node):
                                                      10  # QoS profile, here it's 10 which means a buffer size of 10 messages
         )  
         self.subscription_aruco = self.create_subscription(Pose2D, 
-                                                    f'/pen{self.bot_id}_pose',
+                                                    f"pen{self.bot_id}_pose",
                                                     self.arucoCb,
                                                     10)
         
@@ -121,18 +123,23 @@ class HBController(Node):
         self.pen_down_publisher = self.create_publisher(Bool, 
                                                         f"/pen{self.bot_id}_down",
                                                         10)
+        
+                
+        self.cmd_vel_publisher = self.create_publisher(Vector3,
+                                                          f"/hb_bot_{self.bot_id}/cmd_vell",
+                                                          10)
 
 
         self.hb_x = 250.0
         self.hb_y = 250.0
         self.hb_theta = 0.0
 
-        self.k_mult = 40.0
+        self.k_mult = 20.0
         self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
-        self.ka = 0.4*self.k_mult #2.8 #1.8
+        self.ka = 3.8*self.k_mult #2.8 #1.8
 
-        self.linear_tolerance = 4.5 # linear tolerance
-        self.angular_tolerance = math.radians(8) # degree tolerance
+        self.linear_tolerance = 10.0 #4.5 # linear tolerance
+        self.angular_tolerance = math.radians(15) # degree tolerance
 
         self.left_force = 0.0
         self.right_force = 0.0
@@ -160,7 +167,9 @@ class HBController(Node):
         ---
         -
         '''
-        # ##disable#self.get_logger().info(str(msg))
+        if(self.bot_id == 3):
+            pass
+            # self.get_logger().info(str(msg))
         if(self.locationReceived == False):
             self.locationReceived = True
 
@@ -227,9 +236,6 @@ class HBController(Node):
         -
         '''
         if(self.goalsReceived == False):
-            x = self.bot_home[self.bot_id][0]
-            y = self.bot_home[self.bot_id][1]
-
             self.bot_x_goals = msg.x
             self.bot_y_goals = msg.y
 
@@ -270,6 +276,18 @@ class HBController(Node):
 
         return [goal_x, goal_y, goal_theta, end_of_list]
 
+    
+    def map(self, value, leftMin, leftMax, rightMin, rightMax):
+        # Figure out how 'wide' each range is
+        leftSpan = leftMax - leftMin
+        rightSpan = rightMax - rightMin
+
+        # Convert the left range into a 0-1 range (float)
+        valueScaled = float(value - leftMin) / float(leftSpan)
+
+        # Convert the 0-1 range into a value in the right range.
+        return 180 - (rightMin + (valueScaled * rightSpan))
+    
     def publish_force_vectors(self, force):
         '''
         Purpose:
@@ -289,6 +307,18 @@ class HBController(Node):
         ---
         hb_controller.publish_force_vectors(force)
         '''
+
+        #for hardware
+        cmd_vel = Vector3()
+
+
+        cmd_vel.x = self.map(force[0], -100.0, 100.0, 0.0, 180.0)
+        cmd_vel.y = self.map(force[1], -100.0, 100.0, 0.0, 180.0)
+        cmd_vel.z = self.map(force[2], -100.0, 100.0, 0.0, 180.0)
+        
+        self.cmd_vel_publisher.publish(cmd_vel)
+
+        #for simulator
         force_rear = Wrench()
         force_left = Wrench()
         force_right = Wrench()
@@ -297,9 +327,14 @@ class HBController(Node):
         force_left.force.y = force[1]
         force_right.force.y = force[2]
 
+
         self.rear_wheel_publisher.publish(force_rear)
         self.left_wheel_publisher.publish(force_left)
         self.right_wheel_publisher.publish(force_right)
+
+        if(self.bot_id == 3):
+            pass
+            # self.get_logger().info(f"{force[0]} {force[1]} {force[2]}")
     
     def goal_reached(self, frame):
         '''
@@ -352,6 +387,8 @@ class HBController(Node):
         hb_controller.stop_bot()
         '''
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
+        # time.sleep(2)
+        # self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
 
     def normalize_velocity(self, velocity):
         '''
@@ -419,7 +456,7 @@ class HBController(Node):
                 # response from the service call
                 response = self.get_goal()
             except Exception as e:
-                ##disable###disable#self.get_logger().info('Goal call failed %r' % (e,))
+                #self.get_logger().info('Goal call failed %r' % (e,))
                 pass
             else:
                 #########           GOAL POSE             #########
@@ -429,7 +466,7 @@ class HBController(Node):
                 self.flag = response[3]
                 ####################################################
 
-                ##disable###disable#self.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
+                # self.get_logger().info(f'{x_goal} {y_goal} {math.degrees(theta_goal)}')
                 ##disable###disable#self.get_logger().info(f'cur {self.hb_x} {self.hb_y} {math.degrees(self.hb_theta)}')
                 
                 # Calculate Error from feedback
@@ -460,20 +497,25 @@ class HBController(Node):
                 # Apply appropriate force vectors
                 self.publish_force_vectors(force)
 
+
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
                 if(self.goal_reached(frame)):
                     # self.stop_bot()
+                    self.get_logger().info("gigi")
 
                     if(self.index == 0):
                         bot_is_home[self.bot_id] = 1
                         self.stop_bot()
-                        while(self.allBotsHome() == False):
-                            pass
+                        # while(self.allBotsHome() == False):
+                        #     pass
+                        self.get_logger().info(f"{self.bot_id}index 0")
 
                     if(self.index == 1):
                         msg = Bool()
                         msg.data = True #do pendown
                         self.pen_down_publisher.publish(msg)
+                        self.get_logger().info(f"{self.bot_id}index 1")
+                    self.get_logger().info(f"{self.bot_id} {self.index}")
 
                     
                     if(self.index == len(self.bot_x_goals)-1):
