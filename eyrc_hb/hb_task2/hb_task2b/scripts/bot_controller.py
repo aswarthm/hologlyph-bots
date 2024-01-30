@@ -47,6 +47,9 @@ from std_srvs.srv import Empty
 from geometry_msgs.msg import Vector3
 
 
+isSimulator = True
+
+
 
 # bot_id = 2
 
@@ -59,12 +62,12 @@ bot_done = { # if all are 1 then end run
 }
 
 bot_is_home = {
-    1: 1,
-    2: 1,
+    1: 0,
+    2: 0,
     3: 0
 }
 
-bot_home_flag = 1
+bot_home_flag = 0
 
 class HBController(Node):
     def __init__(self, bot_id):
@@ -111,35 +114,49 @@ class HBController(Node):
                                                     self.arucoCb,
                                                     10)
         
-        self.rear_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/rear_wheel_force",
-                                                          10)
-        self.left_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/left_wheel_force",
-                                                          10)        
-        self.right_wheel_publisher = self.create_publisher(Wrench,
-                                                          f"/hb_bot_{self.bot_id}/right_wheel_force",
-                                                          10)
+
+        if(isSimulator):
+            self.rear_wheel_publisher = self.create_publisher(Wrench,
+                                                            f"/hb_bot_{self.bot_id}/rear_wheel_force",
+                                                            10)
+            self.left_wheel_publisher = self.create_publisher(Wrench,
+                                                            f"/hb_bot_{self.bot_id}/left_wheel_force",
+                                                            10)        
+            self.right_wheel_publisher = self.create_publisher(Wrench,
+                                                            f"/hb_bot_{self.bot_id}/right_wheel_force",
+                                                            10)
+            
+        else:
+            self.cmd_vel_publisher = self.create_publisher(Vector3,
+                                                            f"/hb_bot_{self.bot_id}/cmd_vell",
+                                                            10)
+
+
         self.pen_down_publisher = self.create_publisher(Bool, 
                                                         f"/pen{self.bot_id}_down",
                                                         10)
         
-                
-        self.cmd_vel_publisher = self.create_publisher(Vector3,
-                                                          f"/hb_bot_{self.bot_id}/cmd_vell",
-                                                          10)
+
 
 
         self.hb_x = 250.0
         self.hb_y = 250.0
         self.hb_theta = 0.0
 
-        self.k_mult = 20.0
-        self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
-        self.ka = 3.8*self.k_mult #2.8 #1.8
+        if(isSimulator):
+            self.k_mult = 40.0
+            self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
+            self.ka = 1.8*self.k_mult #2.8 #1.8
 
-        self.linear_tolerance = 10.0 #4.5 # linear tolerance
-        self.angular_tolerance = math.radians(15) # degree tolerance
+            self.linear_tolerance = 4.5 #4.5 # linear tolerance
+            self.angular_tolerance = math.radians(4) # degree tolerance
+        else:
+            self.k_mult = 20.0
+            self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
+            self.ka = 3.8*self.k_mult #2.8 #1.8
+
+            self.linear_tolerance = 10.0 #4.5 # linear tolerance
+            self.angular_tolerance = math.radians(15) # degree tolerance
 
         self.left_force = 0.0
         self.right_force = 0.0
@@ -175,7 +192,7 @@ class HBController(Node):
 
         self.hb_x = msg.x
         self.hb_y = msg.y
-        self.hb_theta = msg.theta
+        self.hb_theta = msg.theta - math.radians(90)
 
     def inverse_kinematics(self, velocity):
         '''
@@ -308,29 +325,31 @@ class HBController(Node):
         hb_controller.publish_force_vectors(force)
         '''
 
-        #for hardware
-        cmd_vel = Vector3()
+        if(isSimulator):
+            #for simulator
+            force_rear = Wrench()
+            force_left = Wrench()
+            force_right = Wrench()
+
+            force_rear.force.y = force[0]
+            force_left.force.y = force[1]
+            force_right.force.y = force[2]
 
 
-        cmd_vel.x = self.map(force[0], -100.0, 100.0, 0.0, 180.0)
-        cmd_vel.y = self.map(force[1], -100.0, 100.0, 0.0, 180.0)
-        cmd_vel.z = self.map(force[2], -100.0, 100.0, 0.0, 180.0)
-        
-        self.cmd_vel_publisher.publish(cmd_vel)
-
-        #for simulator
-        force_rear = Wrench()
-        force_left = Wrench()
-        force_right = Wrench()
-
-        force_rear.force.y = force[0]
-        force_left.force.y = force[1]
-        force_right.force.y = force[2]
+            self.rear_wheel_publisher.publish(force_rear)
+            self.left_wheel_publisher.publish(force_left)
+            self.right_wheel_publisher.publish(force_right)
+        else:
+            #for hardware
+            cmd_vel = Vector3()
 
 
-        self.rear_wheel_publisher.publish(force_rear)
-        self.left_wheel_publisher.publish(force_left)
-        self.right_wheel_publisher.publish(force_right)
+            cmd_vel.x = self.map(force[0], -100.0, 100.0, 0.0, 180.0)
+            cmd_vel.y = self.map(force[1], -100.0, 100.0, 0.0, 180.0)
+            cmd_vel.z = self.map(force[2], -100.0, 100.0, 0.0, 180.0)
+            
+            self.cmd_vel_publisher.publish(cmd_vel)
+
 
         if(self.bot_id == 3):
             pass
@@ -426,7 +445,7 @@ class HBController(Node):
         
         if(bot_home_flag == 0):
             bot_home_flag = 1
-            time.sleep((3-self.bot_id)*3)
+            # time.sleep((self.bot_id)*3)
 
         return True
 
@@ -475,7 +494,7 @@ class HBController(Node):
                 error_theta = theta_goal - self.hb_theta
 
                 # Change the frame by using Rotation Matrix (If you find it required)
-                frame = np.array([-error_theta, error_x, error_y])
+                frame = np.array([error_theta, error_x, error_y])
 
                 rot_matrix = np.array([
                                         [1, 0, 0],
@@ -506,8 +525,10 @@ class HBController(Node):
                     if(self.index == 0):
                         bot_is_home[self.bot_id] = 1
                         self.stop_bot()
-                        # while(self.allBotsHome() == False):
-                        #     pass
+                        while(self.allBotsHome() == False):
+                            pass
+                        else:
+                            time.sleep(8)
                         self.get_logger().info(f"{self.bot_id}index 0")
 
                     if(self.index == 1):

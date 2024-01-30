@@ -50,6 +50,9 @@ from std_msgs.msg import Bool
 ##############################################################
 
 
+isSimulator = True
+
+
 class ArUcoDetector(Node):
 
     def __init__(self):
@@ -87,10 +90,16 @@ class ArUcoDetector(Node):
         self.arucoDetector = cv2.aruco.ArucoDetector(arucoDict, parameters)
 
         # Subscribe the topic /camera/image_raw
-        self.subscription = self.create_subscription(sensor_msgs.msg.Image,
-                                                     "/camera1/image_raw",
-                                                     self.image_callback,
-                                                     10)
+        if(isSimulator):
+            self.subscription = self.create_subscription(sensor_msgs.msg.Image,
+                                                        "/camera/image_raw",
+                                                        self.image_callback,
+                                                        10)
+        else:
+            self.subscription = self.create_subscription(sensor_msgs.msg.Image,
+                                                        "/camera1/image_raw",
+                                                        self.image_callback,
+                                                        10)
                                                     
 
         
@@ -171,26 +180,31 @@ class ArUcoDetector(Node):
         # convert ROS image to opencv image
         img = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
-        img_2 = self.undistort(img)
-        img_2 = self.perspective_transform(img_2)
-        img_2 = cv2.rotate(img_2, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        # sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
-        sharpen_kernel = np.array([  # this works better
-            [0, -1, 0],
-            [-1, 6, -1],
-            [0, -1, 0]
-        ])
-        img_sharp = cv2.filter2D(img, -1, sharpen_kernel)
-        img_sharp = img_2
-        img = img_2
-        # img = img_sharp
-
         # Detect Aruco marker
         DetectedArucoMarkers = {}
         ArucoDetailsDict = {}
         ArucoCorners = {}
         ArucoMarkerAngles = {}
-        corners, ids, rejected = self.arucoDetector.detectMarkers(img_sharp)
+
+        if(isSimulator):
+            sharpen_kernel = np.array([  # this works better
+                [0, -1, 0],
+                [-1, 6, -1],
+                [0, -1, 0]
+            ])
+            img_sharp = cv2.filter2D(img, -1, sharpen_kernel)
+            corners, ids, rejected = self.arucoDetector.detectMarkers(img_sharp)
+        else:
+            img = self.undistort(img)
+            img = self.perspective_transform(img)
+            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            corners, ids, rejected = self.arucoDetector.detectMarkers(img)
+
+        # sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+
+        # img_sharp = img_2
+        # img = img_2
+
         # corners, ids, rejected = self.arucoDetector.detectMarkers(img_2)
         '''
             id 1    bot
@@ -242,7 +256,7 @@ class ArUcoDetector(Node):
                 #skipping theta calibration, by assuming it doesnt matter, calibrate if required
                 botCenterX = float(bot_loc[0][0] - arenaCenter[0]) + 250.0
                 botCenterY = float(bot_loc[0][1] - arenaCenter[1]) + 250.0
-                botTheta = float(bot_loc[1])  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
+                botTheta = float(bot_loc[1]+90.0)  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
 
                 self.bot_path[i].append( (int(bot_loc[0][0]), int(bot_loc[0][1]), int(self.isPenDown[i])) )
 
@@ -332,7 +346,7 @@ class ArUcoDetector(Node):
             
             if(angle > 180.0):
                 angle = angle - 360 # 355 -> -5
-            angle = -round(angle, 2)
+            angle = round(angle, 2)
 
             ArucoMarkerAngles[i] = angle
 
