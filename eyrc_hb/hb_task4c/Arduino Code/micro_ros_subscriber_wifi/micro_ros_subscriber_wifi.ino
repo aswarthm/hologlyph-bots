@@ -31,10 +31,12 @@ std_msgs__msg__Bool pen_down;
 #define rear_servo_pin 25
 #define left_servo_pin 26
 #define right_servo_pin 27
+#define pen_down_servo_pin 33
 
 Servo rear_servo;
 Servo left_servo;
 Servo right_servo;
+Servo pen_down_servo;
 
 
 #define RCCHECK(fn) \
@@ -77,11 +79,14 @@ void velocity_callback(const void *msgin) {
 void pen_down_callback(const void *msgin){
   const std_msgs__msg__Bool * msg = (const std_msgs__msg__Bool *)msgin;
 
-  if(msg->data == 0){ //penup
+  if(msg->data == 0){ 
+    //penup
+    pen_down_servo.write(50);
     Serial.println("Pen Up");
   }
   else{
     //pendown
+    pen_down_servo.write(25);
     Serial.println("Pen Down");
   }
 }
@@ -90,6 +95,10 @@ void init_servos() {
   rear_servo.attach(rear_servo_pin);
   left_servo.attach(left_servo_pin);
   right_servo.attach(right_servo_pin);
+
+  pen_down_servo.attach(pen_down_servo_pin);
+
+  pen_down_servo.write(50);
 }
 
 void setup() {
@@ -98,7 +107,7 @@ void setup() {
   // while (!Serial)
   //   ;
   Serial.println("Start");
-  set_microros_wifi_transports("AstraLAN", "12345678", "192.168.0.100", 8888);
+  set_microros_wifi_transports("AstraLAN", "12345678", "192.168.0.101", 8888);
   Serial.println("wifi connected");
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
@@ -133,8 +142,8 @@ void setup() {
   RCCHECK(rclc_subscription_init_best_effort(
     &pen_down_subscriber,
     &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Vector3),
-    velocity_topic.c_str()));
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Bool),
+    pen_down_topic.c_str()));
 
   // create executor
   RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));
