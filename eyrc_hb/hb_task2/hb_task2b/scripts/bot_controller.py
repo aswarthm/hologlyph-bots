@@ -47,7 +47,7 @@ from std_srvs.srv import Empty
 from geometry_msgs.msg import Vector3
 
 
-isSimulator = True
+isSimulator = False
 
 
 
@@ -151,12 +151,12 @@ class HBController(Node):
             self.linear_tolerance = 4.5 #4.5 # linear tolerance
             self.angular_tolerance = math.radians(4) # degree tolerance
         else:
-            self.k_mult = 20.0
+            self.k_mult = 40.0
             self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
-            self.ka = 3.8*self.k_mult #2.8 #1.8
+            self.ka = 2.8*self.k_mult #2.8 #1.8
 
             self.linear_tolerance = 10.0 #4.5 # linear tolerance
-            self.angular_tolerance = math.radians(15) # degree tolerance
+            self.angular_tolerance = math.radians(8) # degree tolerance
 
         self.left_force = 0.0
         self.right_force = 0.0
@@ -405,6 +405,11 @@ class HBController(Node):
         ---
         hb_controller.stop_bot()
         '''
+
+        msg = Bool()
+        msg.data = False #do penup
+        bot_done[self.bot_id] = 1
+        self.pen_down_publisher.publish(msg)
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
         # time.sleep(2)
         # self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
@@ -428,7 +433,7 @@ class HBController(Node):
         ---
         hb_controller.normalize_velocity(velocity)
         '''
-        max_vel = 60.0
+        max_vel = 100.0
 
         velocity[1] = max(-max_vel, min(velocity[1], max_vel))
         velocity[2] = max(-max_vel, min(velocity[2], max_vel))
@@ -607,6 +612,7 @@ def main(args=None):
 
     finally:
         executor.shutdown()
+
         hb_controller_1.destroy_node()
         hb_controller_2.destroy_node()
         hb_controller_3.destroy_node()

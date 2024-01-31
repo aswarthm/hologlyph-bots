@@ -26,7 +26,7 @@ std_msgs__msg__Bool pen_down;
 
 
 #define LED_PIN 2
-#define BOT_ID 3
+#define BOT_ID 2
 
 #define rear_servo_pin 25
 #define left_servo_pin 26
@@ -146,7 +146,7 @@ void setup() {
     pen_down_topic.c_str()));
 
   // create executor
-  RCCHECK(rclc_executor_init(&executor, &support.context, 3, &allocator));
+  RCCHECK(rclc_executor_init(&executor, &support.context, 4, &allocator));
 
   //add subscriptions
   RCCHECK(rclc_executor_add_subscription(&executor, &velocity_subscriber, &velocity, &velocity_callback, ON_NEW_DATA));

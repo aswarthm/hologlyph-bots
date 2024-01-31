@@ -70,8 +70,8 @@ def generate_launch_description():
         )
 
     return LaunchDescription([
-        world,
-        spawn_bot,
+        # world,
+        # spawn_bot,
         goalPub,
         feedback,
         controller,

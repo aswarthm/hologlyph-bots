@@ -50,7 +50,7 @@ from std_msgs.msg import Bool
 ##############################################################
 
 
-isSimulator = True
+isSimulator = False
 
 
 class ArUcoDetector(Node):
@@ -97,7 +97,7 @@ class ArUcoDetector(Node):
                                                         10)
         else:
             self.subscription = self.create_subscription(sensor_msgs.msg.Image,
-                                                        "/camera1/image_raw",
+                                                        "/image_raw",
                                                         self.image_callback,
                                                         10)
                                                     
