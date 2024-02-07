@@ -62,9 +62,9 @@ bot_done = { # if all are 1 then end run
 }
 
 bot_is_home = {
-    1: 0,
+    1: 1,
     2: 0,
-    3: 0
+    3: 1
 }
 
 bot_home_flag = 0
@@ -533,7 +533,10 @@ class HBController(Node):
                         while(self.allBotsHome() == False):
                             pass
                         else:
-                            time.sleep(8)
+                            if(self.bot_id == 3):
+                                time.sleep(12)
+                            else:
+                                time.sleep(8)
                         self.get_logger().info(f"{self.bot_id}index 0")
 
                     if(self.index == 1):

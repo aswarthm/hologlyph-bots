@@ -194,11 +194,15 @@ class ArUcoDetector(Node):
             ])
             img_sharp = cv2.filter2D(img, -1, sharpen_kernel)
             corners, ids, rejected = self.arucoDetector.detectMarkers(img_sharp)
+            for i in range(0, ids.shape[0]):
+                DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
         else:
             img = self.undistort(img)
             img = self.perspective_transform(img)
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             corners, ids, rejected = self.arucoDetector.detectMarkers(img)
+            for i in range(0, ids.shape[0]):
+                DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
 
         # sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
 
@@ -213,8 +217,6 @@ class ArUcoDetector(Node):
             id 10   top right
             id 12   bott right
         '''
-        for i in range(0, ids.shape[0]):
-            DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
 
         ArucoMarkerAngles = self.getOrientationDeg(DetectedArucoMarkers)
 
@@ -441,15 +443,15 @@ class ArUcoDetector(Node):
             2: [255, 0, 0],
             3: [0, 255, 0],
         }
-        for i in self.bot_ids:
-            path = self.bot_path[i]
-            for index, item in enumerate(path):
-                if index == len(path) - 1:
-                    break
-                if(item[2]):
-                    cv2.line(image, item[:2], path[index + 1][:2], bot_cols[i], 2)
-                else:
-                    cv2.line(image, item[:2], path[index + 1][:2], [50, 50, 50], 1)
+        # for i in self.bot_ids:
+        #     path = self.bot_path[i]
+        #     for index, item in enumerate(path):
+        #         if index == len(path) - 1:
+        #             break
+        #         if(item[2]):
+        #             cv2.line(image, item[:2], path[index + 1][:2], bot_cols[i], 2)
+        #         else:
+        #             cv2.line(image, item[:2], path[index + 1][:2], [50, 50, 50], 1)
                     
         return image
 

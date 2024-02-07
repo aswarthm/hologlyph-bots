@@ -26,12 +26,18 @@ std_msgs__msg__Bool pen_down;
 
 
 #define LED_PIN 2
-#define BOT_ID 2
+#define BOT_ID 3
 
 #define rear_servo_pin 25
 #define left_servo_pin 26
 #define right_servo_pin 27
 #define pen_down_servo_pin 33
+
+int servo_angles[3][2] = { // [servo id][0-up angle, 1-down angle]
+                        {50, 25}, 
+                        {50, 24},
+                        {50, 23},
+};
 
 Servo rear_servo;
 Servo left_servo;
@@ -81,12 +87,12 @@ void pen_down_callback(const void *msgin){
 
   if(msg->data == 0){ 
     //penup
-    pen_down_servo.write(50);
+    pen_down_servo.write(servo_angles[BOT_ID-1][0]);
     Serial.println("Pen Up");
   }
   else{
     //pendown
-    pen_down_servo.write(25);
+    pen_down_servo.write(servo_angles[BOT_ID-1][1]);
     Serial.println("Pen Down");
   }
 }
@@ -107,7 +113,7 @@ void setup() {
   // while (!Serial)
   //   ;
   Serial.println("Start");
-  set_microros_wifi_transports("AstraLAN", "12345678", "192.168.0.101", 8888);
+  set_microros_wifi_transports("AstraLAN", "12345678", "192.168.0.104", 8888);
   Serial.println("wifi connected");
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);

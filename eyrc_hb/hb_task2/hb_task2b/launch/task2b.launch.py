@@ -26,6 +26,7 @@ from launch.substitutions import PathJoinSubstitution,LaunchConfiguration, Pytho
 import os
 from ament_index_python.packages import get_package_share_directory,get_package_prefix
 
+isSimulator = False
 
 def generate_launch_description():
     share_dir = get_package_share_directory('hb_task2b')
@@ -68,14 +69,26 @@ def generate_launch_description():
             package='hb_task2b',
             executable='bot_controller_3.py',
         )
-
-    return LaunchDescription([
-        # world,
-        # spawn_bot,
-        goalPub,
-        feedback,
-        controller,
-        # controller1,
-        # controller2,
-        # controller3,
-        ])
+    
+    if(isSimulator):
+        return LaunchDescription([
+            world,
+            spawn_bot,
+            goalPub,
+            feedback,
+            controller,
+            # controller1,
+            # controller2,
+            # controller3,
+            ])
+    else:
+        return LaunchDescription([
+            # world,
+            # spawn_bot,
+            goalPub,
+            feedback,
+            controller,
+            # controller1,
+            # controller2,
+            # controller3,
+            ])
