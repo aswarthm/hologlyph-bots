@@ -47,7 +47,7 @@ from std_srvs.srv import Empty
 from geometry_msgs.msg import Vector3
 
 
-isSimulator = False
+isSimulator = True
 
 
 
@@ -81,6 +81,7 @@ class HBController(Node):
         self.index = 0
         self.flag = 0
         self.locationReceived = False
+        self.pause = True
 
         
 
@@ -113,6 +114,11 @@ class HBController(Node):
                                                     f"pen{self.bot_id}_pose",
                                                     self.arucoCb,
                                                     10)
+        
+        self.subscription_pause = self.create_subscription(Bool,
+                                                           f"hb_bot_{self.bot_id}/pause",
+                                                           self.pauseCallBack,
+                                                           10)
         
 
         if(isSimulator):
@@ -164,6 +170,10 @@ class HBController(Node):
 
         # For maintaining control loop rate.
         self.rate = self.create_rate(100)
+
+    def pauseCallBack(self, msg):
+        self.pause = msg.data
+        self.get_logger().info(f"{self.bot_id} paused")
 
     def arucoCb(self, msg):
         '''
@@ -406,13 +416,17 @@ class HBController(Node):
         hb_controller.stop_bot()
         '''
 
-        msg = Bool()
-        msg.data = False #do penup
         bot_done[self.bot_id] = 1
-        self.pen_down_publisher.publish(msg)
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
         # time.sleep(2)
         # self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
+    
+    def pen_position(self, pos):
+
+        msg = Bool()
+        msg.data = pos=="DOWN" #true = pendown, false=penup
+        self.pen_down_publisher.publish(msg)
+        
 
     def normalize_velocity(self, velocity):
         '''
@@ -474,6 +488,11 @@ class HBController(Node):
         ---
         -
         '''
+        
+        if(self.pause == True):
+            self.stop_bot()
+            return
+
         # Check if the goals have been received
         if self.goalsReceived == True and self.locationReceived == True:
             try:
@@ -525,11 +544,11 @@ class HBController(Node):
                 # Modify the condition to Switch to Next goal (given position in pixels instead of meters)
                 if(self.goal_reached(frame)):
                     # self.stop_bot()
-                    self.get_logger().info("gigi")
 
                     if(self.index == 0):
                         bot_is_home[self.bot_id] = 1
                         self.stop_bot()
+                        self.pen_position("UP")
                         while(self.allBotsHome() == False):
                             pass
                         else:
@@ -540,21 +559,17 @@ class HBController(Node):
                         self.get_logger().info(f"{self.bot_id}index 0")
 
                     if(self.index == 1):
-                        msg = Bool()
-                        msg.data = True #do pendown
-                        self.pen_down_publisher.publish(msg)
+                        #do pendown
+                        self.pen_position("DOWN")
                         self.get_logger().info(f"{self.bot_id}index 1")
-                    self.get_logger().info(f"{self.bot_id} {self.index}")
+                    # self.get_logger().info(f"{self.bot_id} {self.index}")
 
                     
                     if(self.index == len(self.bot_x_goals)-1):
-                        msg = Bool()
-                        msg.data = False #do penup
-                        bot_done[self.bot_id] = 1
-                        self.pen_down_publisher.publish(msg)
-
                         self.goalsReceived = False
                         self.stop_bot()
+                        #do penup
+                        self.pen_position("UP")
                         self.destroy_node()
                                                                 
                     # if(self.finished_run()):

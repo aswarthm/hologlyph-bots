@@ -50,7 +50,7 @@ from std_msgs.msg import Bool
 ##############################################################
 
 
-isSimulator = False
+isSimulator = True
 
 
 class ArUcoDetector(Node):
@@ -443,15 +443,15 @@ class ArUcoDetector(Node):
             2: [255, 0, 0],
             3: [0, 255, 0],
         }
-        # for i in self.bot_ids:
-        #     path = self.bot_path[i]
-        #     for index, item in enumerate(path):
-        #         if index == len(path) - 1:
-        #             break
-        #         if(item[2]):
-        #             cv2.line(image, item[:2], path[index + 1][:2], bot_cols[i], 2)
-        #         else:
-        #             cv2.line(image, item[:2], path[index + 1][:2], [50, 50, 50], 1)
+        for i in self.bot_ids:
+            path = self.bot_path[i]
+            for index, item in enumerate(path):
+                if index == len(path) - 1:
+                    break
+                if(item[2]):
+                    cv2.line(image, item[:2], path[index + 1][:2], bot_cols[i], 2)
+                else:
+                    cv2.line(image, item[:2], path[index + 1][:2], [50, 50, 50], 1)
                     
         return image
 
