@@ -34,7 +34,7 @@ from rclpy.node import Node
 import time
 import math
 from tf_transformations import euler_from_quaternion
-from my_robot_interfaces.msg import Goal             
+from my_robot_interfaces.msg import Goal, Float1D    
 
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Wrench
@@ -79,9 +79,11 @@ class HBController(Node):
 
         self.goalsReceived = False        
         self.index = 0
+        self.contour_index = 0
         self.flag = 0
         self.locationReceived = False
         self.pause = True
+        self.end_of_run = False
 
         
 
@@ -173,7 +175,7 @@ class HBController(Node):
 
     def pauseCallBack(self, msg):
         self.pause = msg.data
-        self.get_logger().info(f"{self.bot_id} paused")
+        # self.get_logger().info(f"{self.bot_id} paused")
 
     def arucoCb(self, msg):
         '''
@@ -263,8 +265,8 @@ class HBController(Node):
         -
         '''
         if(self.goalsReceived == False):
-            self.bot_x_goals = msg.x
-            self.bot_y_goals = msg.y
+            self.bot_x_goals = self.convert_to_2d(msg.x)
+            self.bot_y_goals = self.convert_to_2d(msg.y)
 
             # self.bot_x_goals = [x].append(msg.x)
             # self.bot_y_goals = [y].append(msg.y)
@@ -276,6 +278,9 @@ class HBController(Node):
 
             # for i in range(5*self.bot_id):
             #     time.sleep(0.4)
+
+    def convert_to_2d(self, msg):
+        return [row.data for row in msg]
     
     def get_goal(self):
         '''
@@ -295,11 +300,13 @@ class HBController(Node):
         ---
         hb_controller.get_goal()
         '''
-        goal_x = self.bot_x_goals[self.index]
-        goal_y = self.bot_y_goals[self.index]
+        goal_x = self.bot_x_goals[self.contour_index][self.index]
+        goal_y = self.bot_y_goals[self.contour_index][self.index]
         goal_theta = self.bot_theta_goal
 
-        end_of_list = int((1 + self.index) >= len(self.bot_x_goals))
+        end_of_list = self.index >= (len(self.bot_x_goals[self.contour_index]) - 1)
+
+        self.end_of_run = self.contour_index >= (len(self.bot_x_goals) - 1) and end_of_list
 
         return [goal_x, goal_y, goal_theta, end_of_list]
 
@@ -553,7 +560,7 @@ class HBController(Node):
                             pass
                         else:
                             if(self.bot_id == 3):
-                                time.sleep(12)
+                                time.sleep(8)#12
                             else:
                                 time.sleep(8)
                         self.get_logger().info(f"{self.bot_id}index 0")
@@ -565,12 +572,12 @@ class HBController(Node):
                     # self.get_logger().info(f"{self.bot_id} {self.index}")
 
                     
-                    if(self.index == len(self.bot_x_goals)-1):
-                        self.goalsReceived = False
+                    if(self.flag == 1):
+                        # self.goalsReceived = False
                         self.stop_bot()
                         #do penup
                         self.pen_position("UP")
-                        self.destroy_node()
+                        # self.destroy_node()
                                                                 
                     # if(self.finished_run()):
                     #     request = Empty.Request()
@@ -579,6 +586,7 @@ class HBController(Node):
                     ############     DO NOT MODIFY THIS       #########
                     self.index += 1
                     if self.flag == 1 :
+                        self.contour_index += 1
                         self.index = 0
                     ####################################################
 

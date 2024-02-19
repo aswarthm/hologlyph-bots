@@ -1,4 +1,4 @@
 int64 bot_id
-float64[] x
-float64[] y
+Float1D[] x
+Float1D[] y
 float64 theta

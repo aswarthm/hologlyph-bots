@@ -27,13 +27,15 @@ class CollisionChecker(Node):
         self.paused = {}
 
         self.bot_pos = {}
+        self.bot_pen_down = {}
         self.bot_pause_pub = {}
         
-        self.distance_threshold = 100.0
+        self.distance_threshold = 50.0
         for i in self.bot_ids:
             
             self.bot_pos[i] = [0.0, 0.0, 0.0]
             self.paused[i] = True
+            self.bot_pen_down[i] = False
             self.bot_pause_pub[i] = self.create_publisher(Bool,
                                                           f"hb_bot_{i}/pause",
                                                           10)
@@ -41,6 +43,10 @@ class CollisionChecker(Node):
                                                            f"pen{i}_pose",
                                                            partial(self.poseCallBack, bot_id=i),
                                                            10)
+            self.penDownSubscriber = self.create_subscription(Bool,
+                                                          f"/pen{i}_down",
+                                                          partial(self.penDownCallBack, bot_id = 1),
+                                                          10)
                 
             
 
@@ -57,26 +63,45 @@ class CollisionChecker(Node):
         
         return True
 
+    def getIDtoPause(self, bot_1_id, bot_2_id):
+        self.get_logger().info(f"{self.bot_pen_down}")
+        if(self.bot_pen_down[bot_1_id] == False):
+            return bot_1_id
+        elif(self.bot_pen_down[bot_2_id] == False):
+            return bot_2_id
+        else:
+            return min(bot_1_id, bot_2_id)
+
     def poseCallBack(self, msg, bot_id):
-
         self.bot_pos[bot_id] = [msg.x, msg.y, msg.theta]
+        colliding_bots = set()
 
-        for bot_1_id, bot_1_pos in self.bot_pos.items():
-            for bot_2_id, bot_2_pos in self.bot_pos.items():
-                if(bot_1_id != bot_2_id):
-                    if(self.collision(bot_1_pos, bot_2_pos) == True):
-                        bot_id = min(bot_1_id, bot_2_id)
-                        if(self.paused[bot_id] == False):
-                            self.get_logger().info(f"{bot_1_id} and {bot_2_id} collision")
-                            self.paused[bot_id] = True
-                            self.publishBotPauseState(bot_id)
-                    else:
-                        if(self.paused[bot_1_id] == True):
-                            self.paused[bot_1_id] = False
-                            self.publishBotPauseState(bot_1_id)
-                        if(self.paused[bot_2_id] == True):
-                            self.paused[bot_2_id] = False
-                            self.publishBotPauseState(bot_2_id)
+        # For each pair of bots, check if they are colliding
+        for i in range(len(self.bot_ids)):
+            for j in range(i+1, len(self.bot_ids)):
+                bot_1_id, bot_2_id = self.bot_ids[i], self.bot_ids[j]
+                bot_1_pos, bot_2_pos = self.bot_pos[bot_1_id], self.bot_pos[bot_2_id]
+                if self.collision(bot_1_pos, bot_2_pos):
+                    bot_to_pause = self.getIDtoPause(bot_1_id, bot_2_id)
+                    if not self.paused[bot_to_pause]:
+                        self.get_logger().info(f"{bot_1_id} and {bot_2_id} collision paused {bot_to_pause} {self.paused}")
+                        self.paused[bot_to_pause] = True
+                        self.publishBotPauseState(bot_to_pause)
+                    colliding_bots.add(bot_1_id)
+                    colliding_bots.add(bot_2_id)
+
+        # Unpause bots that are not colliding with any other bot
+        for bot_id in self.bot_ids:
+            if bot_id not in colliding_bots and self.paused.get(bot_id, False):
+                self.paused[bot_id] = False
+                self.publishBotPauseState(bot_id)
+    
+
+    def penDownCallBack(self, msg, bot_id):
+        
+        self.bot_pen_down[bot_id] = msg.data
+
+
 
         
 

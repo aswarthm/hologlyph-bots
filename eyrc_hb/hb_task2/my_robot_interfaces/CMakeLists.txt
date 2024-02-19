@@ -15,6 +15,7 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/NextGoal.srv"
+  "msg/Float1D.msg"
   "msg/Goal.msg"
   "msg/Shape.msg"
  )
