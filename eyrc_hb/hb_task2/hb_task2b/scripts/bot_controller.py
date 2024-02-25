@@ -559,31 +559,33 @@ class HBController(Node):
                 if(self.goal_reached(frame)):
                     # self.stop_bot()
 
-                    if(self.index == 0):
-                        bot_is_home[self.bot_id] = 1
-                        self.stop_bot()
-                        self.pen_position("UP")
-                        while(self.allBotsHome() != 1.0):
-                            pass
-                        else:
-                            if(self.bot_id == 3):
-                                time.sleep(8)#12
+                    if(bot_home_flag == 0):
+                        if(self.index == 0):
+                            bot_is_home[self.bot_id] = 1
+                            self.stop_bot()
+                            self.pen_position("UP")
+                            while(self.allBotsHome() != 1.0):
+                                pass
                             else:
-                                time.sleep(8)
-                        self.get_logger().info(f"{self.bot_id}index 0")
+                                if(self.bot_id == 3):
+                                    time.sleep(8)#12
+                                else:
+                                    time.sleep(8)
+                            self.get_logger().info(f"{self.bot_id}index 0")
 
-                    if(self.index == 1):
-                        bot_is_home[self.bot_id] = 2
-                        self.stop_bot()
-                        self.pen_position("UP")
-                        while(self.allBotsHome() != 2.0):
-                            pass
-                        else:
-                            if(self.bot_id == 3.0):
-                                time.sleep(8)#12
+                        if(self.index == 1):
+                            bot_is_home[self.bot_id] = 2
+                            self.stop_bot()
+                            self.pen_position("UP")
+                            while(self.allBotsHome() != 2.0):
+                                pass
                             else:
-                                time.sleep(8)
-                        self.get_logger().info(f"{self.bot_id}index 1")
+                                if(self.bot_id == 3.0):
+                                    time.sleep(8)#12
+                                else:
+                                    time.sleep(8)
+                            self.get_logger().info(f"{self.bot_id}index 1")
+                            bot_home_flag = 1
 
                     if(self.index == 2):
                         #do pendown
