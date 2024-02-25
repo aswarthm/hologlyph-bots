@@ -47,7 +47,7 @@ from std_srvs.srv import Empty
 from geometry_msgs.msg import Vector3
 
 
-isSimulator = False
+isSimulator = True
 istask5b = False
 
 
@@ -157,7 +157,7 @@ class HBController(Node):
             self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
             self.ka = 1.8*self.k_mult #2.8 #1.8
 
-            self.linear_tolerance = 4.5 #4.5 # linear tolerance
+            self.linear_tolerance = 10 #4.5 # linear tolerance
             self.angular_tolerance = math.radians(4) # degree tolerance
         else:
             self.k_mult = 50.0 #40.0
@@ -589,7 +589,7 @@ class HBController(Node):
                         #do pendown
                         self.pen_position("DOWN")
                         self.get_logger().info(f"{self.bot_id}index 2")
-                    # self.get_logger().info(f"{self.bot_id} {self.index}")
+                        # self.get_logger().info(f"{self.bot_id} {self.index}")
 
                     
                     if(self.flag == 1):

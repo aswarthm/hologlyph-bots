@@ -50,7 +50,7 @@ from std_msgs.msg import Bool
 ##############################################################
 
 
-isSimulator = False
+isSimulator = True
 istask5b = False
 
 
