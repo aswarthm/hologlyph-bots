@@ -47,7 +47,8 @@ from std_srvs.srv import Empty
 from geometry_msgs.msg import Vector3
 
 
-isSimulator = True
+isSimulator = False
+istask5b = False
 
 
 
@@ -62,9 +63,9 @@ bot_done = { # if all are 1 then end run
 }
 
 bot_is_home = {
-    1: 1,
+    1: 0,
     2: 0,
-    3: 1
+    3: 0
 }
 
 bot_home_flag = 0
@@ -159,7 +160,7 @@ class HBController(Node):
             self.linear_tolerance = 4.5 #4.5 # linear tolerance
             self.angular_tolerance = math.radians(4) # degree tolerance
         else:
-            self.k_mult = 40.0
+            self.k_mult = 50.0 #40.0
             self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
             self.ka = 2.8*self.k_mult #2.8 #1.8
 
@@ -196,7 +197,7 @@ class HBController(Node):
         ---
         -
         '''
-        if(self.bot_id == 3):
+        if(self.bot_id == 2):
             pass
             # self.get_logger().info(str(msg))
         if(self.locationReceived == False):
@@ -204,7 +205,10 @@ class HBController(Node):
 
         self.hb_x = msg.x
         self.hb_y = msg.y
-        self.hb_theta = msg.theta - math.radians(90)
+        if(istask5b):
+            self.hb_theta = msg.theta - math.radians(90)
+        else:
+            self.hb_theta = msg.theta #- math.radians(90)
 
     def inverse_kinematics(self, velocity):
         '''
@@ -465,9 +469,12 @@ class HBController(Node):
     def allBotsHome(self):
         global bot_home_flag
 
+        sum = 0
+
         for i in bot_ids:
-            if(bot_is_home[i] == 0):
-                return False
+            sum += bot_is_home[i]
+        
+        return sum/3
         
         if(bot_home_flag == 0):
             bot_home_flag = 1
@@ -556,7 +563,7 @@ class HBController(Node):
                         bot_is_home[self.bot_id] = 1
                         self.stop_bot()
                         self.pen_position("UP")
-                        while(self.allBotsHome() == False):
+                        while(self.allBotsHome() != 1.0):
                             pass
                         else:
                             if(self.bot_id == 3):
@@ -566,9 +573,22 @@ class HBController(Node):
                         self.get_logger().info(f"{self.bot_id}index 0")
 
                     if(self.index == 1):
+                        bot_is_home[self.bot_id] = 2
+                        self.stop_bot()
+                        self.pen_position("UP")
+                        while(self.allBotsHome() != 2.0):
+                            pass
+                        else:
+                            if(self.bot_id == 3.0):
+                                time.sleep(8)#12
+                            else:
+                                time.sleep(8)
+                        self.get_logger().info(f"{self.bot_id}index 1")
+
+                    if(self.index == 2):
                         #do pendown
                         self.pen_position("DOWN")
-                        self.get_logger().info(f"{self.bot_id}index 1")
+                        self.get_logger().info(f"{self.bot_id}index 2")
                     # self.get_logger().info(f"{self.bot_id} {self.index}")
 
                     

@@ -26,7 +26,7 @@ std_msgs__msg__Bool pen_down;
 
 
 #define LED_PIN 2
-#define BOT_ID 3
+#define BOT_ID 2
 
 #define rear_servo_pin 25
 #define left_servo_pin 26

@@ -64,7 +64,7 @@ class CollisionChecker(Node):
         return True
 
     def getIDtoPause(self, bot_1_id, bot_2_id):
-        self.get_logger().info(f"{self.bot_pen_down}")
+        # self.get_logger().info(f"{self.bot_pen_down}")
         if(self.bot_pen_down[bot_1_id] == False):
             return bot_1_id
         elif(self.bot_pen_down[bot_2_id] == False):

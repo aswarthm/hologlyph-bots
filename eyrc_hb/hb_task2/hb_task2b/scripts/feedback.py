@@ -50,7 +50,8 @@ from std_msgs.msg import Bool
 ##############################################################
 
 
-isSimulator = True
+isSimulator = False
+istask5b = False
 
 
 class ArUcoDetector(Node):
@@ -148,14 +149,14 @@ class ArUcoDetector(Node):
 
     
     def perspective_transform(self, img):
-        pts1 = np.float32([[122, 11], [519, 9], [125, 418], [522, 414]])
+        pts1 = np.float32([[510, 20],[515, 400],[137, 27],[150, 410]])
         # Size of the Transformed Image
-        pts2 = np.float32([[0, 0], [500, 0], [0, 500], [500, 500]])
+        pts2 = np.float32([[0,0],[520,0],[0,520],[520,520]])
 
         # for val in pts1:
         # cv2.circle(undistorted_image,(val[0],val[1]),5,(0,255,0),-1)
         M = cv2.getPerspectiveTransform(pts1, pts2)
-        dst = cv2.warpPerspective(img, M, (500, 500))
+        dst = cv2.warpPerspective(img, M, (520, 520))
         return dst
 
     def image_callback(self, msg):
@@ -199,7 +200,7 @@ class ArUcoDetector(Node):
         else:
             img = self.undistort(img)
             img = self.perspective_transform(img)
-            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            # img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             corners, ids, rejected = self.arucoDetector.detectMarkers(img)
             for i in range(0, ids.shape[0]):
                 DetectedArucoMarkers[int(ids[i][0,])] = corners[i][0,]
@@ -243,8 +244,8 @@ class ArUcoDetector(Node):
         for i in self.bot_ids:
             try:
 
-                ArucoDetailsDict[i][0][0] += 10.0 #pen offset
-                ArucoDetailsDict[i][0][1] += 10.0 #pen offset
+                ArucoDetailsDict[i][0][0] += -5.0 #-18.0 #pen offset
+                ArucoDetailsDict[i][0][1] += -20.0 #20.0 #pen offset
                 
 
                 bot_loc = ArucoDetailsDict[i] #get bot id's details
@@ -258,7 +259,11 @@ class ArUcoDetector(Node):
                 #skipping theta calibration, by assuming it doesnt matter, calibrate if required
                 botCenterX = float(bot_loc[0][0] - arenaCenter[0]) + 250.0
                 botCenterY = float(bot_loc[0][1] - arenaCenter[1]) + 250.0
-                botTheta = float(bot_loc[1]+90.0)  ##############debug change this value later, do not hardcode values. 4.24 because aruco marker is not exactly 0degress to baase of bot
+
+                if(istask5b):
+                    botTheta = float(bot_loc[1]+90.0)
+                else:
+                    botTheta = float(bot_loc[1]+0.0)
 
                 self.bot_path[i].append( (int(bot_loc[0][0]), int(bot_loc[0][1]), int(self.isPenDown[i])) )
 
@@ -452,6 +457,8 @@ class ArUcoDetector(Node):
                     cv2.line(image, item[:2], path[index + 1][:2], bot_cols[i], 2)
                 else:
                     cv2.line(image, item[:2], path[index + 1][:2], [50, 50, 50], 1)
+        
+        cv2.circle(image, (250, 250), 4, (255, 255, 0), -1)
                     
         return image
 
