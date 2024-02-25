@@ -156,7 +156,7 @@ class HBController(Node):
             self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
             self.ka = 1.8*self.k_mult #2.8 #1.8
 
-            self.linear_tolerance = 4.5 #4.5 # linear tolerance
+            self.linear_tolerance = 10 #4.5 # linear tolerance
             self.angular_tolerance = math.radians(4) # degree tolerance
         else:
             self.k_mult = 40.0
@@ -204,7 +204,7 @@ class HBController(Node):
 
         self.hb_x = msg.x
         self.hb_y = msg.y
-        self.hb_theta = msg.theta - math.radians(90)
+        self.hb_theta = msg.theta #- math.radians(90)
 
     def inverse_kinematics(self, velocity):
         '''
