@@ -157,7 +157,7 @@ class HBController(Node):
             self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
             self.ka = 1.8*self.k_mult #2.8 #1.8
 
-            self.linear_tolerance = 4.5 #4.5 # linear tolerance
+            self.linear_tolerance = 10 #4.5 # linear tolerance
             self.angular_tolerance = math.radians(4) # degree tolerance
         else:
             self.k_mult = 50.0 #40.0
