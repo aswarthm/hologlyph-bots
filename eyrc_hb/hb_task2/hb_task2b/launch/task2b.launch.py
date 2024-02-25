@@ -26,7 +26,7 @@ from launch.substitutions import PathJoinSubstitution,LaunchConfiguration, Pytho
 import os
 from ament_index_python.packages import get_package_share_directory,get_package_prefix
 
-isSimulator = False
+isSimulator = True
 
 def generate_launch_description():
     share_dir = get_package_share_directory('hb_task2b')
