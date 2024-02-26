@@ -71,6 +71,17 @@ bot_is_home = {
 bot_home_flag = 0
 
 class HBController(Node):
+    '''
+        Function Name: __init__
+
+        Input : self--> HBController,bot_id-->id of the bot
+
+        Output: None
+
+        Logic: initialises each bot with its id
+
+        Example call: hb_controller.__init__(2)
+    '''
     def __init__(self, bot_id):
         self.bot_id = bot_id
         super().__init__(f'hb_controller{self.bot_id}')
@@ -174,29 +185,33 @@ class HBController(Node):
         # For maintaining control loop rate.
         self.rate = self.create_rate(100)
 
+    '''
+        Function Name: pauseCallBack
+
+        Input : self--> HBController,msg-->
+
+        Output: None
+
+        Logic: Pauses the bot
+
+        Example call: hb_controller.pauseCallBack(10)
+    '''
     def pauseCallBack(self, msg):
         self.pause = msg.data
         # self.get_logger().info(f"{self.bot_id} paused")
 
+        '''
+        Function Name: arucoCb
+
+        Input : self--> HBController, msg--> buffer size of messages
+
+        Output: None
+
+        Logic: Callback function when robot's position changes. Updates local variables with current x,y,theta
+
+        Example call: hb_controller.arucoCb(10)
+    '''
     def arucoCb(self, msg):
-        '''
-        Purpose:
-        ---
-        Callback function when robot's position changes. Updates local variables with current x,y,theta
-
-        Input Arguments:
-        ---
-        self:HBController
-        odom:Pose2D updated odometry of robot
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        -
-        '''
         if(self.bot_id == 2):
             pass
             # self.get_logger().info(str(msg))
@@ -210,25 +225,19 @@ class HBController(Node):
         else:
             self.hb_theta = msg.theta #- math.radians(90)
 
+
+        '''
+        Function Name: inverse_kinematics
+
+        Input : self--> HBController, velocity--> numpy.ndarray in the format [theta, x, y]
+
+        Output: force:numpy.ndarray in the format [rear_wheel, left_wheel, right_wheel]
+
+        Logic: Calculate inverse kinematics for the desired velocity
+
+        Example call: hb_controller.inverse_kinematics(velocity)
+    '''
     def inverse_kinematics(self, velocity):
-        '''
-        Purpose:
-        ---
-        Calculate inverse kinematics for the desired velocity
-
-        Input Arguments:
-        ---
-        self:HBController
-        velocity:numpy.ndarray in the format [theta, x, y]
-
-        Returns:
-        ---
-        force:numpy.ndarray in the format [rear_wheel, left_wheel, right_wheel]
-
-        Example call:
-        ---
-        force = hb_controller.inverse_kinematics(velocity)
-        '''
         ############ ADD YOUR CODE HERE ############
 
         # INSTRUCTIONS & HELP : 
@@ -248,26 +257,19 @@ class HBController(Node):
 
         return force
 
+        '''
+        Function Name: goalCallBack
+
+        Input : self--> HBController, msg--> Goal list of bot containing x, y and theta
+
+        Output: None
+
+        Logic: Callback function when few goals are received. Updates array with goals to be reached
+               Sleeps for a certian amount of time to prevent collision
+
+        Example call: hb_controller.goalCallBack([goal_x, goal_y, goal_theta, end_of_list])
+    '''
     def goalCallBack(self, msg):
-        '''
-        Purpose:
-        ---
-        Callback function when bew goals are received. Updates array with goals to be reached
-        Sleeps for a certian amount of time to prevent collision
-
-        Input Arguments:
-        ---
-        self:HBController
-        msg:Goal goal list of bot containing x, y and theta
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        -
-        '''
         if(self.goalsReceived == False):
             self.bot_x_goals = self.convert_to_2d(msg.x)
             self.bot_y_goals = self.convert_to_2d(msg.y)
@@ -283,27 +285,33 @@ class HBController(Node):
             # for i in range(5*self.bot_id):
             #     time.sleep(0.4)
 
+    '''
+        Function Name: convert_to_2d
+
+        Input : self--> HBController, msg--> Goal list of bot containing x, y and theta
+
+        Output: message in 2d format
+
+        Logic: converts message to 2d format by extracting data from each row
+
+        Example call: hb_controller.convert_to_2d(msg.x))
+    '''
+
     def convert_to_2d(self, msg):
         return [row.data for row in msg]
     
+        '''
+        Function Name: get_goal
+
+        Input : self--> HBController
+
+        Output: [goal_x, goal_y, goal_theta, end_of_list]
+
+        Logic: Returns the next goal for the bot and if all the goals have been reached i.e. end of list
+
+        Example call: hb_controller.get_goal()
+    '''
     def get_goal(self):
-        '''
-        Purpose:
-        ---
-        Returns the next goal for the bot and if all the goals have been reached i.e. end of list
-
-        Input Arguments:
-        ---
-        self:HBController
-
-        Returns:
-        ---
-        [goal_x, goal_y, goal_theta, end_of_list]
-
-        Example call:
-        ---
-        hb_controller.get_goal()
-        '''
         goal_x = self.bot_x_goals[self.contour_index][self.index]
         goal_y = self.bot_y_goals[self.contour_index][self.index]
         goal_theta = self.bot_theta_goal
@@ -314,7 +322,17 @@ class HBController(Node):
 
         return [goal_x, goal_y, goal_theta, end_of_list]
 
-    
+    '''
+        Function Name: map
+
+        Input : self--> HBController,value-->value to be mapped,leftMin-->minimum input value, leftMax-->maximum input value, rightMin-->minimum output value,rightMax-->maximum output value
+
+        Output: 
+
+        Logic: To convert controller values to servo values
+
+        Example call: hb_controller.map(force[0], -100.0, 100.0, 0.0, 180.0)
+    '''   
     def map(self, value, leftMin, leftMax, rightMin, rightMax):
         # Figure out how 'wide' each range is
         leftSpan = leftMax - leftMin
@@ -326,25 +344,18 @@ class HBController(Node):
         # Convert the 0-1 range into a value in the right range.
         return 180 - (rightMin + (valueScaled * rightSpan))
     
+        '''
+        Function Name: publish_force_vectors
+
+        Input : self--> HBController, force--> numpy.ndarray in the format [rear, left, right]
+
+        Output: None
+
+        Logic: Publishes the forces to appropriate wheels, i.e. [rear, left, right]
+
+        Example call: hb_controller.publish_force_vectors(force)
+    ''' 
     def publish_force_vectors(self, force):
-        '''
-        Purpose:
-        ---
-        Publishes the forces to appropriate wheels, i.e. [rear, left, right]
-
-        Input Arguments:
-        ---
-        self:HBController
-        force:numpy.ndarray in the format [rear, left, right]
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        hb_controller.publish_force_vectors(force)
-        '''
 
         if(isSimulator):
             #for simulator
@@ -376,27 +387,18 @@ class HBController(Node):
             pass
             # self.get_logger().info(f"{force[0]} {force[1]} {force[2]}")
     
+        '''
+        Function Name: goal_reached
+
+        Input : self--> HBController, frame--> numpy.ndarray in the format [error_theta, error_x, error_y]
+
+        Output: True if bot has reached goal, False otherwise
+
+        Logic: Checks if the bot is within acceptable limits, which tells if the bot has reached its goal
+
+        Example call: hb_controller.goal_reached(frame)
+    ''' 
     def goal_reached(self, frame):
-        '''
-        Purpose:
-        ---
-        Checks if the bot is within acceptable limits, which tells if the bot has reached its goal
-
-        Input Arguments:
-        ---
-        self:HBController
-        frame:numpy.ndarray in the format [error_theta, error_x, error_y]
-
-        Returns:
-        ---
-        True if bot has reached goal
-        False otherwise
-
-        Example call:
-        ---
-        if(hb_controller.goal_reached(frame)):
-            # do something
-        '''
         error_theta = frame[0]
 
         error_linear = math.sqrt(math.pow(frame[1], 2) + math.pow(frame[2], 2))
@@ -408,30 +410,34 @@ class HBController(Node):
         
         return False
     
+        '''
+        Function Name: stop_bot
+
+        Input : self--> HBController
+
+        Output: None
+
+        Logic: Stops the bot after reaching goal, or in case of an emergency
+
+        Example call: hb_controller.stop_bot()
+    '''
     def stop_bot(self):
-        '''
-        Purpose:
-        ---
-        Stops the bot after reaching goal, or in case of an emergency
-
-        Input Arguments:
-        ---
-        self:HBController
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        hb_controller.stop_bot()
-        '''
 
         # bot_done[self.bot_id] = 1
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
         # time.sleep(2)
         # self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
-    
+    '''
+        Function Name: pen_position
+
+        Input : self--> HBController,pos-->
+
+        Output: None
+
+        Logic: sets the pen to touch the surface when required to draw otherwise lifts the pen up
+
+        Example call: hb_controller.stop_bot()
+    '''  
     def pen_position(self, pos):
 
         msg = Bool()
@@ -439,25 +445,18 @@ class HBController(Node):
         self.pen_down_publisher.publish(msg)
         
 
+        '''
+        Function Name: normalize_velocity
+
+        Input : self--> HBController, velocity-->velocity to be normalised
+
+        Output: normalised velocity list
+
+        Logic: Makes sure the velocities are within acceptable range to prevent unpredictable behaviour
+
+        Example call: hb_controller.normalize_velocity(velocity)
+    ''' 
     def normalize_velocity(self, velocity):
-        '''
-        Purpose:
-        ---
-        Makes sure the velocities are within acceptable range to prevent unpredictable behaviour
-
-        Input Arguments:
-        ---
-        self:HBController
-        velocity: List
-
-        Returns:
-        ---
-        velocity: List
-
-        Example call:
-        ---
-        hb_controller.normalize_velocity(velocity)
-        '''
         max_vel = 100.0
 
         velocity[1] = max(-max_vel, min(velocity[1], max_vel))
@@ -465,7 +464,18 @@ class HBController(Node):
         
         return velocity
 
+    
+    '''
+        Function Name: allBotsHome
 
+        Input : self--> HBController
+
+        Output: True if all bots reach home else False
+
+        Logic: Returns False if any bot is not at home position, otherwise returns True
+
+        Example call: hb_controller.allBotsHome()
+    ''' 
     def allBotsHome(self):
         global bot_home_flag
 
@@ -483,25 +493,18 @@ class HBController(Node):
         return True
 
     
+        '''
+        Function Name: timerCb
+
+        Input : self--> HBController
+
+        Output: None
+
+        Logic: Callback function to run main loop of the controller, simplifies multi threading
+
+        Example call: hb_controller.timerCb()
+    '''   
     def timerCb(self):
-        '''
-        Purpose:
-        ---
-        Callback function to run main loop of the controller
-        simplifies multi threading
-
-        Input Arguments:
-        ---
-        self:HBController
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        -
-        '''
         global bot_home_flag
         
         if(self.pause == True):
@@ -641,13 +644,34 @@ class HBController(Node):
                         
 
 class StopService(Node):
+    '''
+        Function Name: __init__
+
+        Input : self-->Stopservice
+
+        Output: None
+
+        Logic: creates a client for Stop_flag service
+
+        Example call: stop_serv.__init__()
+    '''
     def __init__(self):
         super().__init__(f'stop_service_node_start')
         self.create_timer(0.1, self.timerCb)
 
     def blank(self, request, response):
         return response
-    
+    '''
+        Function Name: finished_run
+
+        Input : self-->Stopservice
+
+        Output: Returns True if all bots are done,else False
+
+        Logic: iterates over the bot_ids and checks the corresponding value in the bot_done dictionary. If any bot is not done (i.e., bot_done[i] == 0), it returns False. If all bots are done, it returns True.
+
+        Example call: self.finished_run()
+    '''    
     def finished_run(self):
 
         for i in bot_ids:
@@ -655,7 +679,17 @@ class StopService(Node):
                 return False
             
         return True
-    
+    '''
+        Function Name: timerCb
+
+        Input : self-->Stopservice
+
+        Output: None
+
+        Logic: callback method for the timer. If finished_run() returns True, it creates a request for the ‘Stop_Flag’ service, sends the request asynchronously
+
+        Example call: self.timerCb()
+    '''
     def timerCb(self):
         if(self.finished_run()):
             self.srv = self.create_service(Empty, 'Stop_Flag', self.blank)

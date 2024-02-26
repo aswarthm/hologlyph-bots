@@ -56,24 +56,21 @@ istask5b = False
 
 class ArUcoDetector(Node):
 
+    '''
+            Purpose: Called when the ArucoDetector Node is initialised
+
+            Input Arguments: self:ArUcoDetector
+
+            Returns: None
+
+            Logic: It sets the IDs of the ArUco markers to be detected in the bot_ids list.
+                   Initializes a dictionary pubs to store publishers for each detected ArUco marker's pose.
+                   Creates a CvBridge object to convert between ROS Image messages and OpenCV images.
+                   Subscribes to the topic "/camera/image_raw" to receive image messages for processing.
+
+            Example call: - super().__init__('ar_uco_detector')
+        '''
     def __init__(self):
-        '''
-            Purpose:
-            ---
-            Called when the ArucoDetector Node is initialised
-
-            Input Arguments:
-            ---
-            self:ArUcoDetector
-
-            Returns:
-            ---
-            None
-
-            Example call:
-            ---
-            -
-        '''
         super().__init__('ar_uco_detector')
         ##disable#self.get_logger().info("feedback start")
 
@@ -118,7 +115,17 @@ class ArUcoDetector(Node):
         for i in self.bot_ids:
             self.bot_path[i] = []
 
+    '''
+            Purpose: Used to check if pen is in down position or up position
 
+            Input Arguments: self:message
+
+            Returns: None
+
+            Logic: It checks data to see if pen is down position or not
+
+            Example call: - self.penDown_1/2/3
+        '''
     def penDown_1(self, msg):
         self.isPenDown[1] = msg.data
         self.get_logger().info("Bot 1 pen Down: " + str(msg.data))
@@ -159,25 +166,19 @@ class ArUcoDetector(Node):
         dst = cv2.warpPerspective(img, M, (520, 520))
         return dst
 
+        '''
+        Purpose: This is a callback function that is called whenever a new image is received on the "/camera/image_raw".
+
+        Input Arguments: self:ArUcoDetector
+                         msg:sensor_msgs.msg.Image Image as viewed by Gazebo Camera
+
+        Returns: None
+
+        Logic: For each detected ArUco marker, it publishes the pose (Pose2D message) on the corresponding ("/detected_aruco_i" where i is the marker ID).
+
+        Example call: -
+        '''
     def image_callback(self, msg):
-        '''
-        Purpose:
-        ---
-        Callback function when new image is published by Gazebo. Calculates postion of markers on the arena, and publishes bot's location
-
-        Input Arguments:
-        ---
-        self:ArUcoDetector
-        msg:sensor_msgs.msg.Image Image as viewed by Gazebo Camera
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        -
-        '''
         # convert ROS image to opencv image
         img = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
@@ -288,25 +289,25 @@ class ArUcoDetector(Node):
         cv2.imshow("lol", img)
         cv2.waitKey(1)
 
+        '''
+        Purpose: Calculates the angle of aruco marker based on the slopes of sides. Angle is wrt y axis
+
+        Input Arguments: self:ArUcoDetector
+                         DetectedArucoMarkers:List
+
+        Returns: ArucoMarkerAngles:List Contains the angles of all the detected aruco markers in degrees
+
+        Logic: The function loops over the detected ArUco markers.
+               For each marker, it iterates over the four corners.
+               For every set of two consecutive corners, it calculates the midpoint and updates the counters.
+               After processing all corners the average of (ans_x and ans_y) is calculated and updates the midpoint coordinates.
+               It then adjusts the midpoint coordinates relative to the first corner.
+               If the y-coordinate of the adjusted midpoint is negative, it adjusts the angle to be in the correct quadrant (360 degrees - arccos).
+               The angle is then rounded and normalized by subtracting 90 degrees to convert it to be measured from the y-axis.
+
+        Example call: ArucoMarkerAngles = self.getOrientationDeg(DetectedArucoMarkers)
+        '''
     def getOrientationDeg(self, DetectedArucoMarkers):
-        '''
-        Purpose:
-        ---
-        Calculates the angle of aruco marker based on the slopes of sides. Angle is wrt y axis
-
-        Input Arguments:
-        ---
-        self:ArUcoDetector
-        DetectedArucoMarkers:List
-
-        Returns:
-        ---
-        ArucoMarkerAngles:List Contains the angles of all the detected aruco markers in degrees
-
-        Example call:
-        ---
-        ArucoMarkerAngles = self.getOrientationDeg(DetectedArucoMarkers)
-        '''
         ArucoMarkerAngles = {}
         cnt = 0
         ans_x = 0
@@ -360,25 +361,20 @@ class ArUcoDetector(Node):
         # returning the angles of the ArUco markers in degrees as a dictionary
         return ArucoMarkerAngles
 
+        '''
+        Purpose: Calibrates center of arena by finding mid point of 3 aruco markers( tl, tr, br ) because "bl" isnt reliably detected
+
+        Input Arguments: self:ArUcoDetector
+                         ArucoDetailsDict:List
+
+        Returns: List: [centerX, centerY] Calibrated values of arena's center
+
+        Logic: Creates an array (corners) containing the corner coordinates of the selected ArUco markers.
+               Calculates the mean of the x-coordinates and y-coordinates separately to find the average 
+
+        Example call:arenaCenter = self.calibrateCenter(ArucoDetailsDict)
+        '''
     def calibrateCenter(self, ArucoDetailsDict):
-        '''
-        Purpose:
-        ---
-        Calibrates center of arena by finding mid point of 3 aruco markers( tl, tr, br ) because "bl" isnt reliably detected
-
-        Input Arguments:
-        ---
-        self:ArUcoDetector
-        ArucoDetailsDict:List
-
-        Returns:
-        ---
-        List: [centerX, centerY] Calibrated values of arena's center
-
-        Example call:
-        ---
-        arenaCenter = self.calibrateCenter(ArucoDetailsDict)
-        '''
         #returns board center
         bl = ArucoDetailsDict[4][0]
         tl = ArucoDetailsDict[8][0]
@@ -400,27 +396,29 @@ class ArUcoDetector(Node):
 
         return [centerX, centerY]
 
+        '''
+        Purpose: Helper function to draw aruco marker ID's, rotation of the marker and path of bot
+
+        Input Arguments: self:ArUcoDetector
+                         image: Image captuered by gazebo camera 
+                         ArucoDetailsDict: Dictionary containing aruco marker ids and center
+                         ArucoCorners: Dictionary containing corners of detected aruco markers
+
+        Returns: image: Image with the extra details overlayed
+
+        Logic: Iterates over each ArUco marker in ArucoDetailsDict.
+               Draws a filled red circle at the center of the ArUco marker.
+               Draws a filled purple circle at one of the corners of the ArUco marker (corner index 0).
+               Iterates over each bot ID in self.bot_ids.
+               Draws green lines representing the paths of each bot.
+               Calculates the center point between the top-left (tl) and top-right (tr) corners.
+               Draws a blue line connecting the center of the ArUco marker to this calculated center.
+               Displays the ArUco marker ID next to the center point.
+               Displays the rotation angle next to the center point.
+
+        Example call: img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
+        '''
     def mark_ArUco_image(self, image, ArucoDetailsDict, ArucoCorners):
-        '''
-        Purpose:
-        ---
-        Helper function to draw aruco marker ID's, rotation of the marker and path of bot
-
-        Input Arguments:
-        ---
-        self:ArUcoDetector
-        image: Image captuered by gazebo camera 
-        ArucoDetailsDict: Dictionary containing aruco marker ids and center
-        ArucoCorners: Dictionary containing corners of detected aruco markers
-
-        Returns:
-        ---
-        image: Image with the extra details overlayed
-
-        Example call:
-        ---
-        img = self.mark_ArUco_image(img, ArucoDetailsDict, ArucoCorners)
-        '''
         for ids, details in ArucoDetailsDict.items():
             center = details[0]
             center = [int(center[0]), int(center[1])]
@@ -462,25 +460,22 @@ class ArUcoDetector(Node):
                     
         return image
 
+        '''
+        Purpose: Publishes Bot's location and yaw
+
+        Input Arguments: self:ArUcoDetector
+                         botLocation:List location of the bot in the format [x, y, theta]
+
+        Returns: None
+
+        Logic: Creates a Pose2D message named botTwist.
+               Sets the x field of the message to the x-coordinate of the bot's location (botLocation[0]).
+               Sets the y field of the message to the y-coordinate of the bot's location (botLocation[1]).
+               Sets the theta field of the message to the yaw angle of the bot's location, converted from degrees to radians .
+
+        Example call: self.publishBotLocation([botCenterX, botCenterY, botTheta])
+        '''
     def publishBotLocation(self, bot_id, botLocation):
-        '''
-        Purpose:
-        ---
-        Publishes Bot's location and yaw
-
-        Input Arguments:
-        ---
-        self:ArUcoDetector
-        botLocation:List location of the bot in the format [x, y, theta]
-
-        Returns:
-        ---
-        None
-
-        Example call:
-        ---
-        self.publishBotLocation([botCenterX, botCenterY, botTheta])
-        '''
         #botLocation is in the format [x, y, theta]
         botTwist = Pose2D()
         botTwist.x = botLocation[0] 

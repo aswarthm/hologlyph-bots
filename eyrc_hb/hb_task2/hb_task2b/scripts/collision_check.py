@@ -1,4 +1,32 @@
 #!/usr/bin/env python3
+'''
+*****************************************************************************************
+*
+*        		===============================================
+*           		Hologlyph Bots (HB) Theme (eYRC 2023-24)
+*        		===============================================
+*
+*  This script is to implement Task 2B of Hologlyph Bots (HB) Theme (eYRC 2023-24).
+*  
+*  This software is made available on an "AS IS WHERE IS BASIS".
+*  Licensee/end user indemnifies and will keep e-Yantra indemnified from
+*  any and all claim(s) that emanate from the use of the Software or 
+*  breach of the terms of this agreement.
+*
+*****************************************************************************************
+'''
+
+
+# Team ID:		    hb_1036
+# Author List:		[ M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad ]
+# Filename:		    collision_check.py
+# Functions:		[__init__(self),publishBotPauseState(self, bot_id),collision(self, bot_1_pos, bot_2_pos),getIDtoPause(self, bot_1_id, bot_2_id),poseCallBack(self, msg, bot_id),penDownCallBack(self, msg, bot_id),main(args=None)]
+# Nodes:		
+#                   Subs: [ 'hb_bot_{self.bot_id}/goal', '/detected_aruco_{self.bot_id}' ]
+#                   Pubs: [ "/hb_bot_{self.bot_id}/rear_wheel_force", "/hb_bot_{self.bot_id}/left_wheel_force", "/hb_bot_{self.bot_id}/right_wheel_force" ]
+# Global Variables: None
+
+################### IMPORT MODULES #######################
 import rclpy
 from rclpy.node import Node
 import time
@@ -20,6 +48,17 @@ from functools import partial
 
 
 class CollisionChecker(Node):
+    '''
+        Function Name: __init__
+
+        Input : self--> CollisionChecker
+
+        Output: None
+
+        Logic: initialises each bot with its id and initializes the corresponding entries in the dictionaries and creates a publisher for pause messages and two subscribers for pose and pen down messages. 
+
+        Example call: self.__init__()
+    '''
     def __init__(self):
         super().__init__(f'collision_checker_node_start')
 
@@ -49,12 +88,32 @@ class CollisionChecker(Node):
                                                           10)
                 
             
+    '''
+        Function Name: publishBotPauseState
 
+        Input : self--> CollisionChecker,bot_id--> id of bot to be paused
+
+        Output: None
+
+        Logic: publishes the pause state of a specific bot
+
+        Example call: self.publishBotPauseState(bot_id)
+    ''' 
     def publishBotPauseState(self, bot_id):
         msg = Bool()
         msg.data = self.paused[bot_id]
         self.bot_pause_pub[bot_id].publish(msg)
+    '''
+        Function Name: collision
 
+        Input : self--> CollisionChecker,bot_1_pos--> position of one bot,bot_2_pos--> position of other bot
+
+        Output: False if distance between 2 bots greater than treshold,else False
+
+        Logic: Calculates euclidean distance between two bots and if they get closer than the treshold value returns True to indicate collision can happen
+
+        Example call: self.publishBotPauseState(bot_id)
+    '''    
     def collision(self, bot_1_pos, bot_2_pos):
 
         distance = math.sqrt(math.pow(bot_1_pos[0] - bot_2_pos[0], 2) + math.pow(bot_1_pos[1] - bot_2_pos[1], 2))
@@ -62,7 +121,17 @@ class CollisionChecker(Node):
             return False
         
         return True
+    '''
+        Function Name: getIDtoPause
 
+        Input : self--> CollisionChecker,bot_1_id--> id of one bot,bot_2_id--> id of other bot
+
+        Output: id of the bot which has to be paused
+
+        Logic: returns the id of the bot which hasn't done pen_down yet or the bot with lower id
+
+        Example call: self.getIDtoPause(bot_1_id,bot_2_id)
+    '''  
     def getIDtoPause(self, bot_1_id, bot_2_id):
         # self.get_logger().info(f"{self.bot_pen_down}")
         if(self.bot_pen_down[bot_1_id] == False):
@@ -71,7 +140,17 @@ class CollisionChecker(Node):
             return bot_2_id
         else:
             return min(bot_1_id, bot_2_id)
+    '''
+        Function Name: poseCallBack
 
+        Input : self--> CollisionChecker,msg-->array with values x,y,theta ,bot_id--> id of bot
+
+        Output: None
+
+        Logic: updates the position of the bots and checks for collisions
+
+        Example call: partial(self.poseCallBack, bot_id=i)
+    '''    
     def poseCallBack(self, msg, bot_id):
         self.bot_pos[bot_id] = [msg.x, msg.y, msg.theta]
         colliding_bots = set()
@@ -96,18 +175,33 @@ class CollisionChecker(Node):
                 self.paused[bot_id] = False
                 self.publishBotPauseState(bot_id)
     
+    '''
+        Function Name: penDownCallBack
 
+        Input : self--> CollisionChecker,msg-->boolean value,bot_id--> id of bot
+
+        Output: None
+
+        Logic: Callback function to update the pen down state of the bot with the given bot_id based on the msg object
+
+        Example call: partial(self.penDownCallBack, bot_id = 1)
+    '''  
     def penDownCallBack(self, msg, bot_id):
         
         self.bot_pen_down[bot_id] = msg.data
-
-
-
+     
         
+'''
+    Function Name: main
 
-        
-        
+    Input : None
 
+    Output: None
+
+    Logic: create a multi-threaded executor and one instance to check for collision between the three bots
+
+    Example call: main()
+'''   
 
 def main(args=None):
     rclpy.init(args=args)
