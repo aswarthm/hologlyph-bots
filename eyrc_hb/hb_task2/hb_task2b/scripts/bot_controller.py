@@ -47,7 +47,7 @@ from std_srvs.srv import Empty
 from geometry_msgs.msg import Vector3
 
 
-isSimulator = True
+isSimulator = False
 istask5b = False
 
 
@@ -160,7 +160,7 @@ class HBController(Node):
             self.linear_tolerance = 10 #4.5 # linear tolerance
             self.angular_tolerance = math.radians(4) # degree tolerance
         else:
-            self.k_mult = 50.0 #40.0
+            self.k_mult = 60.0 #40.0
             self.kp = 0.1*self.k_mult #1.5 # 5.5 gives 78
             self.ka = 2.8*self.k_mult #2.8 #1.8
 
@@ -427,7 +427,7 @@ class HBController(Node):
         hb_controller.stop_bot()
         '''
 
-        bot_done[self.bot_id] = 1
+        # bot_done[self.bot_id] = 1
         self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
         # time.sleep(2)
         # self.publish_force_vectors(np.array([0.0, 0.0, 0.0]))
@@ -502,6 +502,7 @@ class HBController(Node):
         ---
         -
         '''
+        global bot_home_flag
         
         if(self.pause == True):
             self.stop_bot()
@@ -587,7 +588,7 @@ class HBController(Node):
                             self.get_logger().info(f"{self.bot_id}index 1")
                             bot_home_flag = 1
 
-                    if(self.index == 2):
+                    if(self.index == 3):
                         #do pendown
                         self.pen_position("DOWN")
                         self.get_logger().info(f"{self.bot_id}index 2")
@@ -600,6 +601,9 @@ class HBController(Node):
                         #do penup
                         self.pen_position("UP")
                         # self.destroy_node()
+                    
+                    if(self.end_of_run):
+                        bot_done[self.bot_id] = 1
                                                                 
                     # if(self.finished_run()):
                     #     request = Empty.Request()
@@ -613,11 +617,36 @@ class HBController(Node):
                     ####################################################
 
 
+# class StopService(Node):
+#     def __init__(self):
+#         super().__init__(f'stop_service_node_start')
+#         self.client = self.create_client(Empty, 'Stop_Flag')
+#         self.create_timer(0.1, self.timerCb)
+    
+#     def finished_run(self):
+
+#         for i in bot_ids:
+#             if(bot_done[i] == 0):
+#                 return False
+            
+#         return True
+    
+#     def timerCb(self):
+#         if(self.finished_run()):
+#             request = Empty.Request()
+#             self.client.call_async(request)
+#             self.get_logger().info("Finished Run")
+
+#             self.destroy_node()
+                        
+
 class StopService(Node):
     def __init__(self):
         super().__init__(f'stop_service_node_start')
-        self.client = self.create_client(Empty, 'Stop_Flag')
         self.create_timer(0.1, self.timerCb)
+
+    def blank(self, request, response):
+        return response
     
     def finished_run(self):
 
@@ -629,8 +658,7 @@ class StopService(Node):
     
     def timerCb(self):
         if(self.finished_run()):
-            request = Empty.Request()
-            self.client.call_async(request)
+            self.srv = self.create_service(Empty, 'Stop_Flag', self.blank)
             self.get_logger().info("Finished Run")
 
             self.destroy_node()

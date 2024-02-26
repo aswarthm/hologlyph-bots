@@ -30,7 +30,7 @@ class CollisionChecker(Node):
         self.bot_pen_down = {}
         self.bot_pause_pub = {}
         
-        self.distance_threshold = 50.0
+        self.distance_threshold = 65.0
         for i in self.bot_ids:
             
             self.bot_pos[i] = [0.0, 0.0, 0.0]
