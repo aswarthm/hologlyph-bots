@@ -1,5 +1,33 @@
-#include <micro_ros_arduino.h>
+// '''
+// *****************************************************************************************
+// *
+// *        		===============================================
+// *           		Hologlyph Bots (HB) Theme (eYRC 2023-24)
+// *        		===============================================
+// *
+// *  This script is to implement Task 2B of Hologlyph Bots (HB) Theme (eYRC 2023-24).
+// *
+// *  This software is made available on an "AS IS WHERE IS BASIS".
+// *  Licensee/end user indemnifies and will keep e-Yantra indemnified from
+// *  any and all claim(s) that emanate from the use of the Software or
+// *  breach of the terms of this agreement.
+// *
+// *****************************************************************************************
+// '''
 
+/*
+ * Team Id: hb_1036
+ * Author List: [ M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad ]
+ * Filename: micro_ros_subscriber_wifi.ino
+ * Theme: <Theme name -- Specific to eYRC>
+ * Functions: [error_loop(),velocity_callback(const void *msgin), pen_down_callback(const void *msgin),init_servos(), setup(), loop()]
+ * Nodes:		           Subs: [ 'hb_bot_{self.bot_id}/goal', '/detected_aruco_{self.bot_id}' ]
+                       Pubs: [ "/hb_bot_{self.bot_id}/rear_wheel_force", "/hb_bot_{self.bot_id}/left_wheel_force", "/hb_bot_{self.bot_id}/right_wheel_force" ]
+ * Global Variables: None
+ */
+
+// ################### IMPORT MODULES #######################
+#include <micro_ros_arduino.h>
 #include <stdio.h>
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
@@ -56,7 +84,13 @@ Servo pen_down_servo;
     if ((temp_rc != RCL_RET_OK)) {} \
   }
 
-
+/*
+ * Function Name: error_loop
+ * Input: None
+ * Output: None
+ * Logic: Toggles the LED infinitely if any error occurs
+ * Example Call: error_loop()
+ */
 void error_loop() {
   while (1) {
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
@@ -64,7 +98,13 @@ void error_loop() {
     delay(100);
   }
 }
-
+/*
+ * Function Name: velocity_callback
+ * Input: msgin--> input vector with x,y,z components
+ * Output: None
+ * Logic: extracts x,y,z components and stores the rear,left,right velocity
+ * Example Call: valocity_callback()
+ */
 void velocity_callback(const void *msgin) {
   const geometry_msgs__msg__Vector3 *msg = (const geometry_msgs__msg__Vector3 *)msgin;
   double rear_vel = msg->x;
@@ -81,7 +121,13 @@ void velocity_callback(const void *msgin) {
   
   // rear_servo.write(int(speed));
 }
-
+/*
+ * Function Name: velocity_callback
+ * Input: msgin--> input vector with x,y,z components
+ * Output: None
+ * Logic: extracts x,y,z components and stores the rear,left,right velocity
+ * Example Call: valocity_callback()
+ */
 void pen_down_callback(const void *msgin){
   const std_msgs__msg__Bool * msg = (const std_msgs__msg__Bool *)msgin;
 
@@ -97,6 +143,13 @@ void pen_down_callback(const void *msgin){
   }
 }
 
+/*
+ * Function Name: init_servos
+ * Input: msgin--> None
+ * Output: None
+ * Logic: initialises the servos to the pins specified and also initialises pen_down servo
+ * Example Call: init_servos()
+ */
 void init_servos() {
   rear_servo.attach(rear_servo_pin);
   left_servo.attach(left_servo_pin);
