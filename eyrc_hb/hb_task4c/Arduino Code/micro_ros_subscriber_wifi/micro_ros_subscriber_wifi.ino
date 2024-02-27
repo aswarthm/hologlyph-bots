@@ -5,7 +5,7 @@
 // *           		Hologlyph Bots (HB) Theme (eYRC 2023-24)
 // *        		===============================================
 // *
-// *  This script is to implement Task 2B of Hologlyph Bots (HB) Theme (eYRC 2023-24).
+// *  This script is to implement Task 4C of Hologlyph Bots (HB) Theme (eYRC 2023-24).
 // *
 // *  This software is made available on an "AS IS WHERE IS BASIS".
 // *  Licensee/end user indemnifies and will keep e-Yantra indemnified from
@@ -84,13 +84,6 @@ Servo pen_down_servo;
     if ((temp_rc != RCL_RET_OK)) {} \
   }
 
-/*
- * Function Name: error_loop
- * Input: None
- * Output: None
- * Logic: Toggles the LED infinitely if any error occurs
- * Example Call: error_loop()
- */
 void error_loop() {
   while (1) {
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
@@ -122,11 +115,11 @@ void velocity_callback(const void *msgin) {
   // rear_servo.write(int(speed));
 }
 /*
- * Function Name: velocity_callback
- * Input: msgin--> input vector with x,y,z components
+ * Function Name: pen_down_callback
+ * Input: msgin--> input pen position as boolean
  * Output: None
- * Logic: extracts x,y,z components and stores the rear,left,right velocity
- * Example Call: valocity_callback()
+ * Logic: moves pen down if msg->data is 1 and moves pen up if msg->data is 0
+ * Example Call: pen_down_callback()
  */
 void pen_down_callback(const void *msgin){
   const std_msgs__msg__Bool * msg = (const std_msgs__msg__Bool *)msgin;

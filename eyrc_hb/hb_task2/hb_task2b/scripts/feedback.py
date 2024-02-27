@@ -24,8 +24,7 @@ improve by calculating corners only once instead of calibrating everytime
 # Team ID:		    hb_1036
 # Author List:		[ M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad ]
 # Filename:		    feedback.py
-# Functions:
-#			[ Comma separated list of functions in this file ]
+# Functions:        __init__, penDown_1, penDown_2, penDown_3, undistort, perspective_transform, image_callback, getOrientationDeg, calibrateCenter, mark_ArUco_image, publishBotLocation
 # Nodes:		
 #                   Subs: [ /camera/image_raw ]
 #                   Pubs: [ /detectedAruco ]

@@ -20,8 +20,7 @@
 # Team ID:		    hb_1036
 # Author List:		[ M Aswartha Reddy, D K Bharath Reddy, Pulkit Dhamija, Sangeeta Prasad ]
 # Filename:		    bot_controller.py
-# Functions:
-#			[ Comma separated list of functions in this file ]
+# Functions:        __init__, goalCallBack, arucoCb, pauseCallBack, inverse_kinematics, goalCallBack, convert_to_2d, get_goal, map, publish_force_vectors, goal_reached, stop_bot, pen_position, normalize_velocity, allBotsHome, timerCb
 # Nodes:		
 #                   Subs: [ 'hb_bot_{self.bot_id}/goal', '/detected_aruco_{self.bot_id}' ]
 #                   Pubs: [ "/hb_bot_{self.bot_id}/rear_wheel_force", "/hb_bot_{self.bot_id}/left_wheel_force", "/hb_bot_{self.bot_id}/right_wheel_force" ]
